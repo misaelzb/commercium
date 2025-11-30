@@ -1,4 +1,4 @@
-import { HttpResponse, Session } from "@commercium/core";
+import { HttpResponse, Session, User } from "@commercium/core";
 import { createMiddleware } from "hono/factory";
 
 

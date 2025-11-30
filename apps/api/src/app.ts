@@ -4,12 +4,15 @@ import { authRoutes } from './routes/auth';
 import { openAPIRouteHandler } from 'hono-openapi'
 import { Scalar } from '@scalar/hono-api-reference';
 import { userRoutes } from './routes/users';
+import { productRoutes, storeRoutes } from './routes/store';
 
 const app = new Hono()
 
 const routes = app
     .route("/api/auth", authRoutes)
     .route("/api/users", userRoutes)
+    .route("/api/stores", storeRoutes)
+    .route("/api/stores/:storeId/products", productRoutes)
     .get("/", async (c) => {
         const user = await User.fetch(1);
         console.log(user)

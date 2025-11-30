@@ -3,7 +3,7 @@ import type { StatusCode } from 'hono/utils/http-status';
 import { HttpResponse, HttpStatus, User } from "@commercium/core";
 import { Hono } from "hono";
 import { describeRoute, resolver } from 'hono-openapi';
-import { ErrorResponses } from "../util/defaultResponses";
+import { ErrorResponses } from "../util/commonData";
 import { handleInvalidBody } from '../util/validationHandler';
 import z from 'zod';
 

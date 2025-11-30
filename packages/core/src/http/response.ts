@@ -1,19 +1,25 @@
 
 export interface ApiResponse<T = any> {
-    data?: string | T;
+    data?: any;
     error?: string;
 }
 
-export class HttpResponse {
-    public static success<T>(data?: T): ApiResponse<T> {
+export namespace HttpResponse {
+    export const success = (data: any): ApiResponse => {
         return {
             data: data ?? "OK"
         };
     }
 
-    public static error(message: string): ApiResponse<null> {
+    export const error = (message: string): ApiResponse => {
         return {
             error: message
+        };
+    }
+
+    export const notFound = (): ApiResponse => {
+        return {
+            error: "Not found"
         };
     }
 }

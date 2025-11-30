@@ -15,6 +15,20 @@
       "when": 1764511588265,
       "tag": "0001_sloppy_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764518577393,
+      "tag": "0002_mixed_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764522490823,
+      "tag": "0003_volatile_shotgun",
+      "breakpoints": true
     }
   ]
 }

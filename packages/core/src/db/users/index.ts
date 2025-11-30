@@ -4,6 +4,7 @@ import { userTable, type UserTableType } from "./users.sql";
 import { eq, or } from "drizzle-orm";
 import { password } from "bun";
 import { Session } from "../sessions";
+import type { DBQueryResponse } from "..";
 
 export namespace User {
 
@@ -73,13 +74,8 @@ export namespace User {
         })
     });
     export type CreateData = z.infer<typeof CreateSchema>;
-    export type UAuthResponse = {
-        success: boolean,
-        data?: string,
-        errorDetail?: string
-    }
 
-    export const register = async (data: CreateData): Promise<UAuthResponse> => {
+    export const register = async (data: CreateData): Promise<DBQueryResponse> => {
         const existingUser = await fetch(data.username);
         if (existingUser) return { success: false, errorDetail: "Username is already taken" };
 
@@ -93,7 +89,7 @@ export namespace User {
         return { success: true }
     };
 
-    export const login = async (data: LoginData): Promise<UAuthResponse> => {
+    export const login = async (data: LoginData): Promise<DBQueryResponse> => {
         const user = await fetch(data.username, { sensitive: true }) as UserTableType;
         if (!user || !password.verifySync(data.password, user.hashedPassword)) return { success: false, errorDetail: "Invalid credentials" };
 

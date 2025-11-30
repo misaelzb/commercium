@@ -33,7 +33,6 @@ export namespace Session {
         
         if (!session[0]) return null;
         if (session[0].expires < new Date()) {
-            // Eliminar sesión vencida
             await Drizzle.db.delete(sessionsTable).where(eq(sessionsTable.token, token));
             return null;
         }
