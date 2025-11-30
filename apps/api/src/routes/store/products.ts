@@ -13,6 +13,7 @@ export const productRoutes = new Hono<StoreContext>()
     .use("*", authMiddleware, storeCheckMiddleware)
     .get("/:sku",
         describeRoute({
+            tags: ["Products"],
             description: "Get a product by SKU from a store users owns (authorization header required)",
             parameters: [AuthHeaderParameter, ProductSKUParameter, StoreIdParameter],
             responses: {
@@ -42,6 +43,7 @@ export const productRoutes = new Hono<StoreContext>()
 
     .post("/create",
         describeRoute({
+            tags: ["Products"],
             description: "Create a new product in a store users owns",
             parameters: [AuthHeaderParameter, StoreIdParameter],
             responses: {

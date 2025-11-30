@@ -12,7 +12,7 @@ export const storeRoutes = new Hono<AuthContext>()
     .use("*", authMiddleware)
     .post("/create",
         describeRoute({
-
+            tags: ['Store'],
             description: "Create a new store (authorization header required)",
             responses: {
                 201: {
@@ -43,6 +43,7 @@ export const storeRoutes = new Hono<AuthContext>()
 
     .get("/:id",
         describeRoute({
+            tags: ['Store'],
             description: "Get a store by ID (authorization header required)",
             parameters: [AuthHeaderParameter, StoreIdParameter],
             responses: {

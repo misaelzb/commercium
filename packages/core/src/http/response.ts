@@ -5,7 +5,7 @@ export interface ApiResponse<T = any> {
 }
 
 export namespace HttpResponse {
-    export const success = (data: any): ApiResponse => {
+    export const success = (data?: any): ApiResponse => {
         return {
             data: data ?? "OK"
         };

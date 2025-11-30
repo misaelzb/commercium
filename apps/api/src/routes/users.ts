@@ -7,7 +7,7 @@ import { authMiddleware, type AuthContext } from "../middlewares";
 export const userRoutes = new Hono<AuthContext>()
     .get("/me", 
         describeRoute({
-            
+            tags: ["Authorization"]
         }),
         authMiddleware,
         async (c) => {

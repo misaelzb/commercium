@@ -14,6 +14,7 @@ import z from 'zod';
 export const authRoutes = new Hono()
     .post("/register",
         describeRoute({
+            tags: ['Authorization'],
             description: 'Register a new user',
             responses: {
                 [HttpStatus.CREATED]: {
@@ -45,6 +46,7 @@ export const authRoutes = new Hono()
     )
     .post("/login",
         describeRoute({
+            tags: ['Authorization'],
             description: "Login to your account",
             responses: {
                 [HttpStatus.OK]: {
