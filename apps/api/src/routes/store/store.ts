@@ -40,7 +40,7 @@ export const storeRoutes = new Hono<AuthContext>()
             c.status(HttpStatus.CREATED as StatusCode);
             return c.json(HttpResponse.success(response.data))
         })
-    .get("/list", 
+    .get("/list",
         describeRoute({
             tags: ['Store'],
             description: "List all stores owned by logged user",

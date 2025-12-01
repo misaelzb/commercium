@@ -24,6 +24,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # DB migration files
 migrations
+migrations/**
 
 # Sensitive config files
 config.ts

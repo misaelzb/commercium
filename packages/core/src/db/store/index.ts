@@ -12,12 +12,13 @@ export namespace Store {
         description: z.string().min(3).max(255).optional(),
         // logoURL: z.url().optional()
         ownerId: z.number(),
-        createdAt: z.date()
+        createdAt: z.iso.datetime().default(() => new Date().toISOString())
     });
+
 
     export type StoreType = z.infer<typeof StoreSchema>;
     export type StoreTableType = typeof storeTable.$inferSelect;
-    export const StoreCreateSchema = StoreSchema.omit({ id: true, ownerId: true, createdTimestamp: true });
+    export const StoreCreateSchema = StoreSchema.omit({ id: true, ownerId: true, createdAt: true });
 
     export type StoreCreateType = z.infer<typeof StoreCreateSchema>
 
@@ -33,7 +34,10 @@ export namespace Store {
         return { success: true, data: store! };
     }
     export const parse = (data: StoreTableType): StoreType => {
-        return StoreSchema.parse(data);
+        return StoreSchema.parse({
+            ...data,
+            createdAt: new Date(data.createdAt!.toString()).toISOString()
+        });
     }
 
     export const fetch = async (id: number): Promise<StoreType | null> => {
