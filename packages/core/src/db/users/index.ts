@@ -39,14 +39,14 @@ export namespace User {
     }
 
     export const fetch = async (query: number | string, { sensitive }: { sensitive?: boolean } = {}): Promise<InfoType | UserTableType | null> => {
-        const user = await Drizzle.db.select().from(userTable).where(
+        const [user] = await Drizzle.db.select().from(userTable).where(
             or(
                 eq(typeof query === "string" ? userTable.username : userTable.id, query)
             )
         );
-        if (!user[0]) return null;
-        if (sensitive) return user[0];
-        return parse(user[0]);
+        if (!user) return null
+        if (sensitive) return user;
+        return parse(user);
     }
 
 
@@ -81,7 +81,7 @@ export namespace User {
 
         const hashedPassword = password.hashSync(data.password, "bcrypt");
 
-        const user = await Drizzle.db.insert(userTable).values({
+        await Drizzle.db.insert(userTable).values({
             ...data,
             hashedPassword
         });
@@ -89,8 +89,8 @@ export namespace User {
         return { success: true }
     };
 
-    export const login = async (data: LoginData): Promise<DBQueryResponse> => {
-        const user = await fetch(data.username, { sensitive: true }) as UserTableType;
+    export const login = async (data: LoginData): Promise<DBQueryResponse<string>> => {
+        const user = await fetch(data.username, { sensitive: true }) as UserTableType | null;
         if (!user || !password.verifySync(data.password, user.hashedPassword)) return { success: false, errorDetail: "Invalid credentials" };
 
         let sessionToken = await Session.create(user.id);

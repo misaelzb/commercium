@@ -44,11 +44,11 @@ export namespace Products {
     }
 
     export const fetch = async (storeId: number, sku: string): Promise<typeof productsTable.$inferSelect | null> => {
-        let product = await Drizzle.db.select().from(productsTable).where(
+        let [product] = await Drizzle.db.select().from(productsTable).where(
             and(eq(productsTable.sku, sku), eq(productsTable.storeId, storeId))
         );
 
-        return product[0] ?? null;
+        return product ?? null;
     }
 
     export const update = async (storeId: number, originalSku: string, data: z.infer<typeof ProductUpdateSchema>): Promise<DBQueryResponse> => {

@@ -14,24 +14,24 @@ export namespace Store {
         // logoURL: z.url().optional()
     });
 
-    export type StoreType = z.infer<typeof StoreSchema>;
+    export type StoreType = typeof storeTable.$inferSelect;
     export const StoreCreateSchema = StoreSchema.omit({ id: true });
 
     export type StoreCreateType = z.infer<typeof StoreCreateSchema>
 
-    export const create = async (userId: number, data: StoreCreateType): Promise<DBQueryResponse> => {
-        let cData = await Drizzle.db.insert(storeTable).values({
+    export const create = async (userId: number, data: StoreCreateType): Promise<DBQueryResponse<StoreType>> => {
+        let [cData] = await Drizzle.db.insert(storeTable).values({
             ...data,
             description: data.description ?? "No description provided",
             ownerId: userId
         }).$returningId();
 
-        let store = await fetch(cData[0]?.id!);
+        let store = await fetch(cData?.id!);
         
-        return { success: true, data: store };
+        return { success: true, data: store! };
     }
 
-    export const fetch = async (id: number) => {
+    export const fetch = async (id: number): Promise<StoreType | null> => {
         let store = await Drizzle.db.select().from(storeTable).where(
             eq(storeTable.id, id)
         );

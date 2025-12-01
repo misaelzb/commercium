@@ -1,5 +1,5 @@
-export type DBQueryResponse = {
+export type DBQueryResponse<T = any> = {
     success: boolean,
-    data?: any,
+    data?: T,
     errorDetail?: string
 }
