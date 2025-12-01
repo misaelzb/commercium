@@ -9,7 +9,7 @@ export const userTable = mysqlTable("users", {
     username: varchar("username", { length: 25 }).notNull().unique(),
     hashedPassword: varchar("hashed_password", { length: 255 }).notNull(),
 
-    createdTimestamp: timestamp("created_timestamp").defaultNow()
+    createdAt: timestamp("created_at").defaultNow()
 });
 
 
