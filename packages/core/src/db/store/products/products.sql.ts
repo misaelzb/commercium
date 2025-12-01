@@ -16,4 +16,5 @@ export const productsTable = mysqlTable("products", {
 
     isActive: boolean('is_active').default(true),
     createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
 });

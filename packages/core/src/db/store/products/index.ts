@@ -79,6 +79,7 @@ export namespace Products {
         if (data.description !== undefined) updatePayload.description = data.description;
         if (data.stock !== undefined) updatePayload.stock = data.stock;
         if (data.isActive !== undefined) updatePayload.isActive = data.isActive;
+        updatePayload.updatedAt = new Date();
 
 
         await Drizzle.db
