@@ -10,12 +10,14 @@ export namespace Store {
         id: z.number(),
         name: z.string().min(3).max(255),
         description: z.string().min(3).max(255).optional(),
-        // ownerId: it's userId taken from current session
         // logoURL: z.url().optional()
+        ownerId: z.number(),
+        createdAt: z.date()
     });
 
-    export type StoreType = typeof storeTable.$inferSelect;
-    export const StoreCreateSchema = StoreSchema.omit({ id: true });
+    export type StoreType = z.infer<typeof StoreSchema>;
+    export type StoreTableType = typeof storeTable.$inferSelect;
+    export const StoreCreateSchema = StoreSchema.omit({ id: true, ownerId: true, createdTimestamp: true });
 
     export type StoreCreateType = z.infer<typeof StoreCreateSchema>
 
@@ -30,12 +32,23 @@ export namespace Store {
         
         return { success: true, data: store! };
     }
+    export const parse = (data: StoreTableType): StoreType => {
+        return StoreSchema.parse(data);
+    }
 
     export const fetch = async (id: number): Promise<StoreType | null> => {
-        let store = await Drizzle.db.select().from(storeTable).where(
+        let [store] = await Drizzle.db.select().from(storeTable).where(
             eq(storeTable.id, id)
         );
 
-        return store[0] ?? null;
+        return store ? parse(store) : null;
+    }
+
+    export const listAll = async (userId: number): Promise<StoreType[]> => {
+        let stores = await Drizzle.db.select().from(storeTable).where(
+            eq(storeTable.ownerId, userId)
+        );
+
+        return stores.map(parse);
     }
 }

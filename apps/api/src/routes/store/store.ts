@@ -40,7 +40,29 @@ export const storeRoutes = new Hono<AuthContext>()
             c.status(HttpStatus.CREATED as StatusCode);
             return c.json(HttpResponse.success(response.data))
         })
+    .get("/list", 
+        describeRoute({
+            tags: ['Store'],
+            description: "List all stores owned by logged user",
+            parameters: [AuthHeaderParameter],
+            responses: {
+                200: {
+                    description: "Stores found",
+                    content: {
+                        "application/json": {
+                            schema: resolver(z.object({
+                                data: z.array(Store.StoreSchema)
+                            }))
+                        }
+                    }
+                }
+            }
+        }), async (c) => {
+            let currentUser = c.get("currentUser");
+            let stores = await Store.listAll(currentUser.id);
 
+            return c.json(HttpResponse.success(stores));
+        })
     .get("/:id",
         describeRoute({
             tags: ['Store'],
