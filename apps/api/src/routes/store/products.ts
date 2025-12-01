@@ -11,17 +11,42 @@ import type { StatusCode } from "hono/utils/http-status";
 // /api/stores/:id/products
 export const productRoutes = new Hono<StoreContext>()
     .use("*", authMiddleware, storeCheckMiddleware)
+    .get("/s/list",
+        describeRoute({
+            description: "List all products in a store",
+            tags: ["Products"],
+            parameters: [AuthHeaderParameter, StoreIdParameter],
+            responses: {
+                200: {
+                    description: "Products found",
+                    content: {
+                        "application/json": {
+                            schema: resolver(z.object({
+                                data: z.array(Products.ProductSchema)
+                            }))
+                        }
+                    }
+                }
+            }
+        }), async (c) => {
+            let store = c.get("store");
+            let products = await Products.listAll(store.id);
+
+            return c.json(HttpResponse.success(products));
+        })
     .get("/:sku",
         describeRoute({
             tags: ["Products"],
-            description: "Get a product by SKU from a store users owns (authorization header required)",
+            description: "Get a product by SKU from a store users owns",
             parameters: [AuthHeaderParameter, ProductSKUParameter, StoreIdParameter],
             responses: {
                 200: {
                     description: "Product found",
                     content: {
                         "application/json": {
-                            schema: resolver(Products.ProductSchema)
+                            schema: resolver(z.object({
+                                data: Products.ProductSchema
+                            }))
                         }
                     }
                 },
@@ -38,13 +63,13 @@ export const productRoutes = new Hono<StoreContext>()
                 return c.json(HttpResponse.notFound())
             }
 
-            return c.json(product);
+            return c.json(HttpResponse.success(product));
         })
 
     .post("/create",
         describeRoute({
             tags: ["Products"],
-            description: "Create a new product in a store users owns",
+            description: "Create a new product in a store",
             parameters: [AuthHeaderParameter, StoreIdParameter],
             responses: {
                 201: {
@@ -64,7 +89,7 @@ export const productRoutes = new Hono<StoreContext>()
             if (!result.success) return handleInvalidBody(result.error, c);
         }), async (c) => {
             let store = c.get("store");
-            let body = await c.req.json();
+            let body = c.req.valid("json");
 
             let response = await Products.create(store.id, body);
             if (!response.success) {
@@ -73,6 +98,72 @@ export const productRoutes = new Hono<StoreContext>()
             }
 
             c.status(HttpStatus.CREATED as StatusCode);
+            return c.json(HttpResponse.success(response.data))
+        }
+    )
+    .put("/:sku",
+        describeRoute({
+            tags: ["Products"],
+            description: "Update a product in a store",
+            parameters: [AuthHeaderParameter, ProductSKUParameter, StoreIdParameter],
+            responses: {
+                200: {
+                    description: "Product updated",
+                    content: {
+                        "application/json": {
+                            schema: resolver(z.object({
+                                data: Products.ProductSchema
+                            }))
+                        }
+                    }
+                },
+                400: ErrorResponses[400]
+            }
+        }),
+        zValidator("json", Products.ProductUpdateSchema, (result, c) => {
+            if (!result.success) return handleInvalidBody(result.error, c);
+        }), async (c) => {
+            let store = c.get("store");
+            let sku = c.req.param("sku");
+            let body = c.req.valid("json")
+
+            let response = await Products.update(store.id, sku, body);
+            if (!response.success) {
+                c.status(400);
+                return c.json(HttpResponse.error(response.errorDetail!));
+            }
+
+            return c.json(HttpResponse.success(response.data));
+        }
+    )
+    .delete("/:sku",
+        describeRoute({
+            tags: ["Products"],
+            description: "Delete a product in a store",
+            parameters: [AuthHeaderParameter, StoreIdParameter, ProductSKUParameter],
+            responses: {
+                200: {
+                    description: "Product deleted",
+                    content: {
+                        "application/json": {
+                            schema: resolver(z.object({
+                                data: z.literal("OK")
+                            }))
+                        }
+                    }
+                },
+                400: ErrorResponses[400]
+            }
+        }), async (c) => {
+            let store = c.get("store");
+            let sku = c.req.param("sku");
+
+            let response = await Products.remove(store.id, sku);
+            if (!response.success) {
+                c.status(400)
+                return c.json(HttpResponse.error(response.errorDetail!))
+            }
+
             return c.json(HttpResponse.success(response.data))
         }
     );
