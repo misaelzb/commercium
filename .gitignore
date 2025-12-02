@@ -22,9 +22,10 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.production.local
 .env.local
 
-# DB migration files
-migrations
-migrations/**
+
+
+
+.vscode
 
 # Sensitive config files
 config.ts

@@ -11,6 +11,5 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "private": true,
   "type": "module"
 }
