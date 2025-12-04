@@ -1,4 +1,4 @@
-import { CoSafeContainer } from '@/components/CoSafeContainer';
+import { CoSafeContainer } from '@/components/';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
