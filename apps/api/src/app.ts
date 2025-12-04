@@ -5,10 +5,12 @@ import { openAPIRouteHandler } from 'hono-openapi'
 import { Scalar } from '@scalar/hono-api-reference';
 import { userRoutes } from './routes/users';
 import { storeRoutes } from './routes/store';
+import { cors } from 'hono/cors';
 
 const app = new Hono()
 
 const routes = app
+    .use(cors())
     .route("/api/auth", authRoutes)
     .route("/api/users", userRoutes)
     .route("/api/stores", storeRoutes) // Includes routes related to products

@@ -4,6 +4,7 @@ export const Palette = {
     backgroundSecondary: '#685f34ff', 
 
     success: '#73AF6F', 
+    danger: '#f05959ff',
     primary: '#007E6E', 
 
     textPrimary: '#333333',

@@ -39,4 +39,8 @@ export namespace Session {
         const user = await User.fetch(session[0].userId);
         return user;
     }
+
+    export const remove = async (token: string) => {
+        await Drizzle.db.delete(sessionsTable).where(eq(sessionsTable.token, token));
+    }
 }

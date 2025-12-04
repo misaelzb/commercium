@@ -22,7 +22,7 @@ export namespace User {
                 description: "Last name of the user",
                 example: "Doe"
             }),
-            username: z.string().min(5).max(25).openapi({
+            username: z.string().min(5).max(25).regex(/^[a-zA-Z0-9_]{4,25}$/).openapi({
                 description: "Username of the user",
                 example: "johndoe"
             })
@@ -50,12 +50,8 @@ export namespace User {
     }
 
 
-    export const LoginSchema = z.object({
-        username: z.string().min(5).max(25).openapi({
-            description: "Username of the user",
-            example: "johndoe"
-        }),
-        password: z.string().openapi({ // Without length validations
+    export const LoginSchema = InfoSchema.pick({ username: true }).extend({
+        password: z.string().openapi({
             description: "Password of the user",
             example: "4-S3cr3t-P@ssw0rd"
         })

@@ -3,7 +3,7 @@ import { TouchableOpacity } from "react-native";
 import { Palette } from "@/styles/pallete";
 interface CoButtonProps {
     title: string;
-    onPress: () => void;
+    onPress?: () => void;
     disabled?: boolean;
     isLoading?: boolean;
     type?: 'primary' | 'secondary';
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 
 export const CoButton: React.FC<CoButtonProps> = ({
     title,
-    onPress,
+    onPress = () => {},
     disabled = false,
     isLoading = false,
     type = "primary"

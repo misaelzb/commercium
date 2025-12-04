@@ -1,11 +1,12 @@
 import { zValidator } from '@hono/zod-validator'
 import type { StatusCode } from 'hono/utils/http-status';
-import { HttpResponse, HttpStatus, User } from "@commercium/core";
-import { Hono } from "hono";
+import { HttpResponse, HttpStatus, Session, User } from "@commercium/core";
+import { Hono, type Context } from "hono";
 import { describeRoute, resolver } from 'hono-openapi';
-import { ErrorResponses } from "../util/commonData";
+import { AuthHeaderParameter, ErrorResponses } from "../util/commonData";
 import { handleInvalidBody } from '../util/validationHandler';
 import z from 'zod';
+import { authMiddleware, type AuthContext } from '../middlewares';
 
 
 // TODO: Poner ejemplos de responses
@@ -77,5 +78,34 @@ export const authRoutes = new Hono()
                 c.status(HttpStatus.BAD_REQUEST as StatusCode);
                 return c.json(HttpResponse.error(response.errorDetail as string));
             }
+        }
+    )
+    .get("/logout",
+        authMiddleware,
+        describeRoute({
+            tags: ['Authorization'],
+            description: "Logout from your account",
+            responses: {
+                [HttpStatus.OK]: {
+                    description: "Successful logout",
+                    content: {
+                        'application/json': {
+                            schema: resolver(z.object({
+                                data: z.string()
+                            })),
+                            example: {
+                                data: "OK"
+                            }
+                        },
+                    }
+                }
+            },
+            parameters: [AuthHeaderParameter]
+        }),
+        async (c: Context<AuthContext>) => {
+            let session = c.get("sessionToken");
+            await Session.remove(session)
+
+            return c.json(HttpResponse.success());
         }
     );

@@ -11,3 +11,8 @@ export const getSessionToken = async () => {
     const token = await SecureStore.getItemAsync(TOKEN_KEY);
     return token;
 };
+
+export const deleteSessionToken = async () => {
+    await SecureStore.deleteItemAsync(TOKEN_KEY);
+    return true;
+};

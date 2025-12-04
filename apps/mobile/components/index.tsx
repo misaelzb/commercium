@@ -1,1 +1,2 @@
-export { CoButton } from "./Button"
+export { CoButton } from "./CoButton"
+export { CoInput } from "./CoInput"

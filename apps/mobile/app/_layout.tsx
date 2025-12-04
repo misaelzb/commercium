@@ -1,6 +1,7 @@
 import { AuthProvider, useAuth } from '@/contexts';
 import { Stack } from 'expo-router';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' }
@@ -14,7 +15,6 @@ const RootStack = () => {
     </View>
   }
 
-  console.log(currentUser)
   return (
     <Stack screenOptions={{ headerShown: false }}>
       {currentUser ? (
@@ -27,7 +27,9 @@ const RootStack = () => {
 }
 
 export default function Layout() {
-  return <AuthProvider>
-    <RootStack />
-  </AuthProvider>;
+  return <SafeAreaProvider>
+    <AuthProvider>
+      <RootStack />
+    </AuthProvider>
+  </SafeAreaProvider>
 }

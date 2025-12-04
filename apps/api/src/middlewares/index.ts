@@ -1,15 +1,15 @@
 import type { Store, User } from "@commercium/core";
 
-export type AuthContext = {
+export interface AuthContext {
     Variables: {
         currentUser: User.InfoType;
+        sessionToken: string;
     };
 };
 
-export type StoreContext = {
-    Variables: {
+export interface StoreContext {
+    Variables: AuthContext['Variables'] & {
         store: Store.StoreType;
-        currentUser: User.InfoType;
     };
 }
 export { authMiddleware } from "./auth"
