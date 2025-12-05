@@ -7,7 +7,6 @@ import { router } from 'expo-router';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
-// Define las props del componente
 interface SettingItemProps {
     iconName: IconName; 
     title: string;
