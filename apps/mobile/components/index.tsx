@@ -1,3 +1,5 @@
 export { CoButton } from "./CoButton"
 export { CoInput } from "./CoInput"
 export { CoSafeContainer } from "./CoSafeContainer"
+export { CoCard, CoCardTitle } from "./CoCard"
+export { CoText, type CoTextProps } from "./CoText"

@@ -1,6 +1,6 @@
 // /auth
 
-import { CoButton, CoInput } from "@/components";
+import { CoButton, CoCard, CoInput, CoText, CoCardTitle, CoSafeContainer } from "@/components";
 import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
 import { router } from "expo-router";
@@ -13,21 +13,6 @@ const styles = StyleSheet.create({
         width: "100%",
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    card: {
-        width: '80%',
-        padding: 20,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-    },
-    cardTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    cardText: {
-        fontSize: 16,
-        marginBottom: 10,
     },
     errorContainer: {
         backgroundColor: Palette.danger,
@@ -70,10 +55,10 @@ export default function AuthScreen() {
                 if (response.error) setError(response.error);
                 else {
                     auth.signIn({ username, password })
-                    .then(() => router.push("/(tabs)"))
-                    .catch(() => setError("Something went wrong. Try again later"))
+                        .then(() => router.push("/(tabs)"))
+                        .catch(() => setError("Something went wrong. Try again later"))
                 }
-            } catch(error) {
+            } catch (error) {
                 setError(`${error}`);
             } finally {
                 setIsLoading(false);
@@ -85,7 +70,7 @@ export default function AuthScreen() {
                 else {
                     router.push("/(tabs)");
                 }
-            } catch(error) {
+            } catch (error) {
                 setError(`${error}`);
             } finally {
                 setIsLoading(false);
@@ -94,74 +79,77 @@ export default function AuthScreen() {
     }
 
 
-    return <View style={styles.container}>
-        {error && <View style={[styles.card, styles.errorContainer]}>
+    return <CoSafeContainer style={{ flex: 1, justifyContent: "center", marginLeft: 15, marginRight: 15 }}>
+        {error && <CoCard style={[styles.errorContainer]}>
             <Text style={styles.errorText}>{error}</Text>
-        </View>}
-        <View style={[styles.card]}>
+        </CoCard>}
+        <CoCard>
             {!isRegistering ? <>
-                <Text style={styles.cardTitle}>Access to your account</Text>
-                <Text style={styles.cardText}>Welcome! Insert your credentials to access</Text>
+                <CoCardTitle>Access to your account</CoCardTitle>
+                <CoText>Welcome! Insert your credentials to access</CoText>
                 <View style={{ marginTop: 10 }} />
-                <CoInput
-                    editable={!isLoading}
-                    onChangeText={setUsername}
-                    placeholder="Username" 
-                    value={username}/>
-                <CoInput
-                    editable={!isLoading}
-                    textContentType="password"
-                    onChangeText={setPassword}
-                    secureTextEntry={true}
-                    autoCapitalize="none"
-                    placeholder="Password"
-                    value={password} />
-                <CoButton title="Sign In" onPress={handleAuth} />
+                <View>
+                    <CoInput
+                        editable={!isLoading}
+                        onChangeText={setUsername}
+                        placeholder="Username"
+                        value={username} />
+                    <CoInput
+                        editable={!isLoading}
+                        textContentType="password"
+                        onChangeText={setPassword}
+                        secureTextEntry={true}
+                        autoCapitalize="none"
+                        placeholder="Password"
+                        value={password} />
+                    <CoButton title="Sign In" onPress={handleAuth} />
+                </View>
             </> : <>
-                <Text style={styles.cardTitle}>Account creation</Text>
-                <Text style={styles.cardText}>Fill the form to create an account</Text>
+                <CoCardTitle>Account creation</CoCardTitle>
+                <CoText>Fill the form to create an account</CoText>
                 <View style={{ marginTop: 10 }} />
-                <Text style={{ marginBottom: 5, fontWeight: 'bold' }}>Personal information</Text>
-                <CoInput
-                    editable={!isLoading}
-                    onChangeText={setFirstName}
-                    placeholder="First Name"
-                    value={firstName}/>
-                <CoInput
-                    editable={!isLoading}
-                    onChangeText={setLastName}
-                    placeholder="Last Name"
-                    value={lastName}/>
-                <View style={{ marginTop: 10 }} />
-                <Text style={{ marginBottom: 5, fontWeight: 'bold' }}>Access Credentials</Text>
-                <CoInput
-                    editable={!isLoading}
-                    onChangeText={setUsername}
-                    placeholder="Username"
-                    value={username}/>
-                <CoInput
-                    editable={!isLoading}
-                    textContentType="password"
-                    onChangeText={setPassword}
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    autoCapitalize="none"
-                    value={password} />
-                <CoInput
-                    editable={!isLoading}
-                    textContentType="password"
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry={true}
-                    autoCapitalize="none"
-                    placeholder="Repeat your password"
-                    value={confirmPassword} />
-                <CoButton title="Create account" onPress={handleAuth} />
+                <View>
+                    <Text style={{ marginBottom: 5, fontWeight: 'bold' }}>Personal information</Text>
+                    <CoInput
+                        editable={!isLoading}
+                        onChangeText={setFirstName}
+                        placeholder="First Name"
+                        value={firstName} />
+                    <CoInput
+                        editable={!isLoading}
+                        onChangeText={setLastName}
+                        placeholder="Last Name"
+                        value={lastName} />
+                    <View style={{ marginTop: 10 }} />
+                    <Text style={{ marginBottom: 5, fontWeight: 'bold' }}>Access Credentials</Text>
+                    <CoInput
+                        editable={!isLoading}
+                        onChangeText={setUsername}
+                        placeholder="Username"
+                        value={username} />
+                    <CoInput
+                        editable={!isLoading}
+                        textContentType="password"
+                        onChangeText={setPassword}
+                        placeholder="Password"
+                        secureTextEntry={true}
+                        autoCapitalize="none"
+                        value={password} />
+                    <CoInput
+                        editable={!isLoading}
+                        textContentType="password"
+                        onChangeText={setConfirmPassword}
+                        secureTextEntry={true}
+                        autoCapitalize="none"
+                        placeholder="Repeat your password"
+                        value={confirmPassword} />
+                    <CoButton title="Create account" onPress={handleAuth} />
+                </View>
             </>}
-            <View style={{ marginTop: 10 }} />
             <CoButton title={isRegistering ? "Already have one? Sign in" : "Don't have an account? Sign up"} type="secondary" onPress={() => {
                 setIsRegistering(!isRegistering)
                 setError(null);
             }} />
-        </View>
-    </View>
+        </CoCard>
+    </CoSafeContainer>
 }

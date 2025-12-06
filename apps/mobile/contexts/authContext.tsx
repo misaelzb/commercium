@@ -1,10 +1,10 @@
 import { client, deleteSessionToken, getSessionToken, saveSessionToken } from "@/services";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ApiResponse, User } from "@commercium/core"
+import { ApiResponse, Store, User } from "@commercium/core"
 
 
 interface AuthContextType {
-    currentUser: User.InfoType | null;
+    currentUser: (User.InfoType & { stores: Store.StoreType[] }) | null;
     isLoading: boolean;
     signUp: (data: User.CreateData) => Promise<ApiResponse>; // does not return user! must sign in after register
     signIn: (data: User.LoginData) => Promise<ApiResponse>;
@@ -19,9 +19,15 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User.InfoType | null>(null);
+    const [stores, setStores] = useState<Store.StoreType[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [authToken, setAuthToken] = useState<string | null>(null);
     
+
+    let authHeader = {
+        'Authorization': `Bearer ${authToken}`,
+    }
+
     const loadInitialData = async () => {
         try {
             const token = await getSessionToken();
@@ -36,6 +42,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 if (!json.error) { // user session is NOT expired
                     setAuthToken(token);
                     setUser(json.data);
+                    let storesResponse = await client.api.stores.list.$get({}, {
+                        headers: authHeader });
+                    let sJson = await storesResponse.json();
+                    setStores(sJson.data);
+                } else { // user session is expired
+                    await deleteSessionToken();
                 }
             }
         } catch (error) {
@@ -50,9 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         loadInitialData();
     }, []);
-    const authHeader = {
-        'Authorization': `Bearer ${authToken}`,
-    }
+
     const signUp = async ({ username, password, firstName, lastName }: User.CreateData) => {
         let response = await client.api.auth.register.$post({
             json: {
@@ -92,7 +102,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 
     return <AuthContext.Provider value={{
-        currentUser: user,
+        currentUser: user ? {
+            ...user,
+            stores: stores!
+        } : null,
         isLoading,
         signUp,
         signIn,
