@@ -43,6 +43,13 @@
       "when": 1764629404907,
       "tag": "0005_abnormal_flatman",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1764989888974,
+      "tag": "0006_giant_medusa",
+      "breakpoints": true
     }
   ]
 }

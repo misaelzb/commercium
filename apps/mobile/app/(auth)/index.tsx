@@ -54,7 +54,7 @@ export default function AuthScreen() {
                 });
                 if (response.error) setError(response.error);
                 else {
-                    auth.signIn({ username, password })
+                    await auth.signIn({ username, password })
                         .then(() => router.push("/(tabs)"))
                         .catch(() => setError("Something went wrong. Try again later"))
                 }
@@ -68,7 +68,7 @@ export default function AuthScreen() {
                 let response = await auth.signIn({ username, password });
                 if (response.error) setError(response.error);
                 else {
-                    router.push("/(tabs)");
+                    router.replace("/(tabs)");
                 }
             } catch (error) {
                 setError(`${error}`);
@@ -102,7 +102,7 @@ export default function AuthScreen() {
                         autoCapitalize="none"
                         placeholder="Password"
                         value={password} />
-                    <CoButton title="Sign In" onPress={handleAuth} />
+                    <CoButton text="Sign In" onPress={handleAuth} />
                 </View>
             </> : <>
                 <CoCardTitle>Account creation</CoCardTitle>
@@ -143,10 +143,10 @@ export default function AuthScreen() {
                         autoCapitalize="none"
                         placeholder="Repeat your password"
                         value={confirmPassword} />
-                    <CoButton title="Create account" onPress={handleAuth} />
+                    <CoButton text="Create account" onPress={handleAuth} />
                 </View>
             </>}
-            <CoButton title={isRegistering ? "Already have one? Sign in" : "Don't have an account? Sign up"} type="secondary" onPress={() => {
+            <CoButton text={isRegistering ? "Already have one? Sign in" : "Don't have an account? Sign up"} type="secondary" onPress={() => {
                 setIsRegistering(!isRegistering)
                 setError(null);
             }} />

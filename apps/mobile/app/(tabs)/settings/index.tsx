@@ -44,7 +44,7 @@ const SettingsTab = () => {
     const auth = useAuth();
     async function handleSignOut() {
         await auth.signOut();
-        router.push('/(auth)');
+        router.replace('/(auth)');
     }
     return <CoSafeContainer>
         <Text style={styles.sectionTitle}>Account</Text>

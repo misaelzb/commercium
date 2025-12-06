@@ -8,8 +8,8 @@ import type { DBQueryResponse } from "..";
 export namespace Store {
     export const StoreSchema = z.object({
         id: z.number(),
-        name: z.string().min(3).max(255),
-        description: z.string().min(3).max(255).optional(),
+        name: z.string().min(3).max(35),
+        description: z.string().min(3).max(50).optional().nullable().default(null),
         // logoURL: z.url().optional()
         ownerId: z.number(),
         createdAt: z.iso.datetime().default(() => new Date().toISOString())
@@ -54,5 +54,13 @@ export namespace Store {
         );
 
         return stores.map(parse);
+    }
+
+    export const remove = async (id: number): Promise<DBQueryResponse<string>> => {
+        await Drizzle.db.delete(storeTable).where(
+            eq(storeTable.id, id)
+        );
+
+        return { success: true, data: "OK" };
     }
 }

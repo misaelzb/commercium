@@ -31,7 +31,7 @@ export default function CoInput({
 const styles = StyleSheet.create({
     container: {
         gap: 4,
-        marginBottom: 12,
+        marginBottom: 9,
     },
     input: {
         height: 44,

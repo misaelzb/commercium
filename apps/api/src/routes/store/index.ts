@@ -94,6 +94,27 @@ export const storeRoutes = new Hono<StoreContext>()
             c.status(HttpStatus.OK as StatusCode);
             return c.json(HttpResponse.success(store));
         }) 
+    .delete("/:id",
+        describeRoute({
+            tags: ['Store'],
+            description: "Delete a store",
+            parameters: [AuthHeaderParameter, StoreIdParameter]
+        }), async (c) => {
+            let id = c.req.param("id");
+            let store = await Store.fetch(parseInt(id));
+            if (!store) {
+                c.status(404);
+                return c.json(HttpResponse.notFound())
+            }
+            if (store.ownerId !== c.get("currentUser").id) {
+                c.status(403);
+                return c.json(HttpResponse.error("You are not the owner of this store"))
+            }
+
+            await Store.remove(parseInt(id));
+            return c.json(HttpResponse.success("OK"))
+        }
+    )
     // Product related routes.
     .get("/:id/products/s/list",
         describeRoute({

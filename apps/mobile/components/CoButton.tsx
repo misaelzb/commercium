@@ -1,12 +1,14 @@
-import { ActivityIndicator, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacityProps } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { Palette } from "@/styles/pallete";
-interface CoButtonProps {
-    title: string;
+import { CoText } from "./CoText";
+
+interface CoButtonProps extends TouchableOpacityProps {
+    text: string;
     onPress?: () => void;
     disabled?: boolean;
     isLoading?: boolean;
-    type?: 'primary' | 'secondary';
+    type?: 'primary' | 'secondary' | 'danger';
 }
 
 const styles = StyleSheet.create({
@@ -23,29 +25,33 @@ const styles = StyleSheet.create({
     }
 })
 
-export const CoButton: React.FC<CoButtonProps> = ({
-    title,
-    onPress = () => {},
+export const CoButton = ({
+    text: title,
+    onPress,
     disabled = false,
     isLoading = false,
-    type = "primary"
-}) => {
+    type = "primary",
+    ...props
+}: CoButtonProps) => {
     const isDisabled = disabled || isLoading;
+    const colors = {
+        primary: Palette.backgroundPrimary,
+        secondary: Palette.backgroundSecondary,
+        danger: Palette.danger,
+    }
     return (
         <TouchableOpacity
             onPress={onPress}
             disabled={isDisabled}
             style={[
                 styles.button,
-                { backgroundColor: isDisabled ? 'gray' : (
-                    type === 'primary' ? Palette.backgroundPrimary : Palette.backgroundSecondary
-                ) },
+                { backgroundColor: isDisabled ? 'gray' : colors[type ?? 'primary']  },
             ]}
         >
             {isLoading ? (
                 <ActivityIndicator size="small" color="white" />
             ) : (
-                <Text style={styles.buttonText}>{title.toUpperCase()}</Text>
+                <CoText style={styles.buttonText}>{title.toUpperCase()}</CoText>
             )}
         </TouchableOpacity>
     );
