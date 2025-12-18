@@ -1,29 +1,30 @@
+import { CoLoadingContainer } from '@/components';
 import { AuthProvider, useAuth } from '@/contexts';
+import { Palette } from '@/styles/pallete';
 import { Stack } from 'expo-router';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-const styles = StyleSheet.create({
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' }
-})
 
 const RootStack = () => {
   const { currentUser, isLoading } = useAuth();
   if (isLoading) {
-    return <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" />
-    </View>
+    return <CoLoadingContainer />
   }
 
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {currentUser ? (
-        <Stack.Screen name="(tabs)" />
-      ) : (
-        <Stack.Screen name="(auth)/index" options={{ animation: 'fade' }} />
-      )}
-    </Stack>
-  );
+  return <Stack screenOptions={{
+    title: 'Commercium',
+    headerShown: true,
+    headerStyle: {
+      backgroundColor: Palette.backgroundPrimary,
+    },
+    headerTintColor: 'white',
+  }}>
+    {currentUser ? (
+      <Stack.Screen name="(tabs)/index" />
+    ) : (
+      <Stack.Screen name="/auth/index" options={{ animation: 'fade' }} />
+    )}
+  </Stack>
 }
 
 export default function Layout() {

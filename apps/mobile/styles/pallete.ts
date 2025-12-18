@@ -1,7 +1,8 @@
 
 export const Palette = {
     backgroundPrimary: '#54965fff', 
-    backgroundSecondary: '#9bb174ff', 
+    backgroundSecondary: '#7d915cff', 
+    backgroundHighlight: '#97b171ff',
     
     gray: "#ccc",
     yellow: "#ebe377ff",

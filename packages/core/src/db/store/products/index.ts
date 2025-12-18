@@ -18,9 +18,13 @@ export namespace Products {
         isActive: z.boolean().default(true)
     });
 
+    export type ProductType = z.infer<typeof ProductSchema>;
+
     export const ProductCreateSchema = ProductSchema.omit({ id: true, storeId: true });
     export const ProductUpdateSchema = ProductCreateSchema.partial()
         .refine((data) => Object.keys(data).length > 0, { error: "At least one field must be provided", path: ["data"] });
+
+    export type ProductCreateType = z.infer<typeof ProductCreateSchema>;
 
 
     export const create = async (storeId: number, data: z.infer<typeof ProductCreateSchema>): Promise<DBQueryResponse> => {

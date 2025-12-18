@@ -4,46 +4,63 @@ import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native'
 
 interface CoInputProps extends TextInputProps {
     error?: string;
+    label?: string;
+    prefix?: string;
 }
 
 export default function CoInput({
     error,
     style,
+    label,
+    prefix,
     ...props
 }: CoInputProps) {
     return (
         <View style={styles.container}>
-            
-            <TextInput
-                style={[
-                    styles.input,
-                    error && styles.inputError,
-                    style,
-                ]}
-                {...props}
-            />
+            {label && <Text style={styles.inputLabel}>{label}</Text>}
 
+            <View style={[styles.inputWrapper]}>
+                {prefix && <Text style={styles.prefix}>{prefix}</Text>}
+                <TextInput
+                    style={[
+                        styles.input,
+                        style,
+                    ]}
+                    {...props}
+                />
+            </View>
             {error && <Text style={styles.error}>{error}</Text>}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    inputLabel: {
+        fontSize: 16,
+        fontWeight: '600'
+    },
     container: {
         gap: 4,
         marginBottom: 9,
     },
-    input: {
-        height: 44,
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
-        paddingHorizontal: 12,
-        fontSize: 16,
         backgroundColor: '#fff',
+        height: 44,
+        paddingHorizontal: 12,
     },
-    inputError: {
-        borderColor: Palette.danger,
+    prefix: {
+        fontSize: 16,
+        marginRight: 6,
+        color: '#555'
+    },
+    input: {
+        flex: 1,
+        fontSize: 16,
     },
     error: {
         color: Palette.danger,

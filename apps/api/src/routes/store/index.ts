@@ -62,7 +62,7 @@ export const storeRoutes = new Hono<StoreContext>()
             let currentUser = c.get("currentUser");
             let stores = await Store.listAll(currentUser.id);
 
-            return c.json(HttpResponse.success(stores));
+            return c.json(HttpResponse.success<Store.StoreType[]>(stores));
         })
     .get("/:id",
         describeRoute({
@@ -116,7 +116,8 @@ export const storeRoutes = new Hono<StoreContext>()
         }
     )
     // Product related routes.
-    .get("/:id/products/s/list",
+    .get("/:storeId/products/s/list",
+        storeCheckMiddleware,
         describeRoute({
             description: "List all products in a store",
             tags: ["Products"],
@@ -135,11 +136,13 @@ export const storeRoutes = new Hono<StoreContext>()
             }
         }), async (c) => {
             let store = c.get("store");
+            console.log(store)
             let products = await Products.listAll(store.id);
 
             return c.json(HttpResponse.success(products));
         })
-    .get("/:id/products/:sku",
+    .get("/:storeId/products/:sku",
+        storeCheckMiddleware,
         describeRoute({
             tags: ["Products"],
             description: "Get a product by SKU from a store users owns",
@@ -171,7 +174,7 @@ export const storeRoutes = new Hono<StoreContext>()
             return c.json(HttpResponse.success(product));
         })
 
-    .post("/:id/products/create",
+    .post("/:storeId/products/create",
         describeRoute({
             tags: ["Products"],
             description: "Create a new product in a store",
@@ -206,7 +209,7 @@ export const storeRoutes = new Hono<StoreContext>()
             return c.json(HttpResponse.success(response.data))
         }
     )
-    .put("/:id/products/:sku",
+    .put("/:storeId/products/:sku",
         describeRoute({
             tags: ["Products"],
             description: "Update a product in a store",
@@ -241,7 +244,7 @@ export const storeRoutes = new Hono<StoreContext>()
             return c.json(HttpResponse.success(response.data));
         }
     )
-    .delete("/:id/products/:sku",
+    .delete("/:storeId/products/:sku",
         describeRoute({
             tags: ["Products"],
             description: "Delete a product in a store",

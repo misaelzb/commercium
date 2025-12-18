@@ -41,7 +41,7 @@ export const AuthHeaderParameter: any = { // ParameterObject
 }
 
 export const StoreIdParameter: any = {
-    name: "id",
+    name: "storeId",
     in: "path",
     description: "ID of the store",
     required: true,

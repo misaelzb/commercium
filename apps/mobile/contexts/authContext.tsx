@@ -43,9 +43,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     let storesResponse = await client.api.stores.list.$get({}, {
                         headers: authHeader });
                     let sJson = await storesResponse.json();
+                    if (json.error) {
+                        throw new Error(sJson.error);
+                    }
                     setAuthToken(token);
                     console.log(sJson);
-                    setStores(sJson.data);
+                    setStores(sJson.data as Store.StoreType[]);
                     setUser(json.data);
                 } else { // user session is expired
                     await deleteSessionToken();
@@ -76,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
         }, { headers: authHeader });
         let json = await response.json();
-        return json;
+        return json as ApiResponse;
     }
 
     const signIn = async ({ username, password }: User.LoginData) => {
@@ -92,7 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await saveSessionToken(json.data);
             await revalidateUser();
         }
-        return json;
+        return json as ApiResponse;
     }
 
     const signOut = async () => {

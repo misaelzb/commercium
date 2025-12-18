@@ -3,6 +3,7 @@ import { Drizzle } from "../../shared/drizzle";
 import { storeTable } from "./store.sql";
 import { eq } from "drizzle-orm";
 import type { DBQueryResponse } from "..";
+import { productsTable } from "./products/products.sql";
 
 
 export namespace Store {
@@ -57,6 +58,9 @@ export namespace Store {
     }
 
     export const remove = async (id: number): Promise<DBQueryResponse<string>> => {
+        await Drizzle.db.delete(productsTable).where(
+            eq(productsTable.storeId, id)
+        );
         await Drizzle.db.delete(storeTable).where(
             eq(storeTable.id, id)
         );

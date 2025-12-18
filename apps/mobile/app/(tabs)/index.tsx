@@ -8,6 +8,7 @@ import { BlurView } from "expo-blur"
 import { client } from '@/services';
 import { router } from 'expo-router';
 import { Store } from '@commercium/core';
+import { CoModal } from '@/components/CoModal';
 
 export default function HomeTab() {
   const { currentUser, authHeader } = useAuth();
@@ -57,7 +58,7 @@ export default function HomeTab() {
   const handleDeleteStore = async () => {
     setLoading(true);
     let response = await client.api.stores[':id'].$delete({
-      param: { id: storePressedId.toString()}
+      param: { id: storePressedId.toString() }
     }, {
       headers: authHeader
     });
@@ -73,77 +74,59 @@ export default function HomeTab() {
   return (
     <CoSafeContainer>
       {createStoreModalVisible ?
-        <Modal
-          animationType="fade"
-          transparent={true}
+        <CoModal
           visible={createStoreModalVisible}
-          onRequestClose={toggleShowModal}>
-          <BlurView intensity={100} tint="dark" style={styles.absoluteFull}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <CoText asTitle>Add your store</CoText>
-                {!error ? <CoText>Start taking control of your business with commercium</CoText>
-                  : <CoText style={{ color: Palette.danger }}>{error}</CoText>}
-                <View>
-                  <CoInput
-                    placeholder='Your store name'
-                    value={storeName}
-                    onChangeText={setStoreName}
-                  />
-                  <CoInput
-                    placeholder='Description of your store (optional)'
-                    value={storeDescription}
-                    onChangeText={setStoreDescription}
-                  />
-                </View>
-                <View style={{ gap: 5 }}>
-                  <CoButton
-                    type='primary'
-                    text="Create"
-                    isLoading={isLoading}
-                    onPress={handleCreateStore} />
-                  <CoButton
-                    type='secondary'
-                    text="Cancel"
-                    disabled={isLoading}
-                    onPress={toggleShowModal} />
-                </View>
-              </View>
-            </View>
-          </BlurView>
-
-        </Modal>
+          onClose={toggleShowModal}
+        >
+          <CoText asTitle>Add your store</CoText>
+          {!error ? <CoText>Start taking control of your business with commercium</CoText>
+            : <CoText style={{ color: Palette.danger }}>{error}</CoText>}
+          <View>
+            <CoInput
+              placeholder='Your store name'
+              value={storeName}
+              onChangeText={setStoreName}
+            />
+            <CoInput
+              placeholder='Description of your store (optional)'
+              value={storeDescription}
+              onChangeText={setStoreDescription}
+            />
+          </View>
+          <View style={{ gap: 5 }}>
+            <CoButton
+              type='primary'
+              text="Create"
+              isLoading={isLoading}
+              onPress={handleCreateStore} />
+            <CoButton
+              type='secondary'
+              text="Cancel"
+              disabled={isLoading}
+              onPress={toggleShowModal} />
+          </View>
+        </CoModal>
         : null}
-      
-      {deleteStoreModalVisible ? <Modal
-          animationType="fade"
-          transparent={true}
-          visible={deleteStoreModalVisible}
-          onRequestClose={toggleShowModal}>
-          <BlurView intensity={100} tint="dark" style={styles.absoluteFull}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <CoText asTitle>Delete store</CoText>
-                {!error ? <CoText>Do you want to delete '{storePressedName}'?</CoText>
-                  : <CoText style={{ color: Palette.danger }}>{error}</CoText>}
-                <View style={{ gap: 5 }}>
-                  <CoButton
-                    type='danger'
-                    text="Yes, delete this store"
-                    isLoading={isLoading}
-                    onPress={handleDeleteStore} />
-                  <CoButton
-                    type='secondary'
-                    text="Cancel"
-                    disabled={isLoading}
-                    onPress={toggleShowDeleteModal} />
-                </View>
-              </View>
-            </View>
-          </BlurView>
 
-        </Modal>
+      {deleteStoreModalVisible ? <CoModal visible={deleteStoreModalVisible} onClose={toggleShowDeleteModal}>
+        <CoText asTitle>Delete store</CoText>
+        {!error ? <CoText>Do you want to delete '{storePressedName}'?</CoText>
+          : <CoText style={{ color: Palette.danger }}>{error}</CoText>}
+        <View style={{ gap: 5 }}>
+          <CoButton
+            type='danger'
+            text="Yes, delete this store"
+            isLoading={isLoading}
+            onPress={handleDeleteStore} />
+          <CoButton
+            type='secondary'
+            text="Cancel"
+            disabled={isLoading}
+            onPress={toggleShowDeleteModal} />
+        </View>
+      </CoModal>
         : null}
+
 
       <ScrollView>
         <CoCard style={styles.infoCard}>
@@ -155,11 +138,16 @@ export default function HomeTab() {
 
           <View style={styles.storesGrid}>
             {localStores.map((store, arrIndex) => (
-              <CoCard touchable onLongPress={() => {
-                setStorePressedId(store.id);
-                setStorePressedName(store.name);
-                toggleShowDeleteModal();
-              }} key={arrIndex} style={[styles.storeCard]}>
+              <CoCard touchable
+                onLongPress={() => {
+                  setStorePressedId(store.id);
+                  setStorePressedName(store.name);
+                  toggleShowDeleteModal();
+                }}
+                onPress={() => {
+                  router.push(`/store/${store.id}`);
+                }}
+                key={arrIndex} style={[styles.storeCard]}>
                 <CoCardTitle white>{store.name}</CoCardTitle>
                 <CoText white style={{ textAlign: 'center' }}>{store.description}</CoText>
               </CoCard>
@@ -176,34 +164,6 @@ export default function HomeTab() {
 }
 
 const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    gap: 10,
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 30,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 20,
-  },
-  absoluteFull: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
   storesGrid: {
     flex: 1,
     flexWrap: 'wrap',
@@ -216,7 +176,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.backgroundSecondary,
     width: '48%',
     height: '48%',
-    aspectRatio: 3 / 2,
+    aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
