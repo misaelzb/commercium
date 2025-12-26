@@ -153,7 +153,7 @@ export const storeRoutes = new Hono<StoreContext>()
             "application/json": {
               schema: resolver(
                 z.object({
-                  data: "OK",
+                  data: z.string("OK"),
                 })
               ),
             },
