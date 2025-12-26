@@ -3,17 +3,20 @@ import { Drizzle } from "../../../shared/drizzle";
 import { productsTable } from "./products.sql";
 import { and, eq } from "drizzle-orm";
 import type { DBQueryResponse } from "../..";
+import { dateValue } from "../../../util/specialTypes";
 
 export namespace Products {
   export const ProductSchema = z.object({
     id: z.number(),
     sku: z.string().min(3).max(255),
-    description: z.string().min(3).max(255),
+    description: z.string().min(3).max(255).nonempty(),
     costPrice: z.number(),
     salePrice: z.number(),
     storeId: z.number(),
     stock: z.number().default(0),
     isActive: z.boolean().default(true),
+    createdAt: dateValue(),
+    updatedAt: dateValue(),
   });
 
   export type ProductType = z.infer<typeof ProductSchema>;
@@ -21,6 +24,8 @@ export namespace Products {
   export const ProductCreateSchema = ProductSchema.omit({
     id: true,
     storeId: true,
+    createdAt: true,
+    updatedAt: true,
   });
   export const ProductUpdateSchema = ProductCreateSchema.partial().refine(
     (data) => Object.keys(data).length > 0,
@@ -57,15 +62,19 @@ export namespace Products {
   export const fetch = async (
     storeId: number,
     sku: string
-  ): Promise<typeof productsTable.$inferSelect | null> => {
+  ): Promise<ProductType | null> => {
     let [product] = await Drizzle.db
       .select()
       .from(productsTable)
       .where(
         and(eq(productsTable.sku, sku), eq(productsTable.storeId, storeId))
       );
-
-    return product ?? null;
+    if (!product) return null;
+    return {
+      ...product,
+      costPrice: Number(product.costPrice),
+      salePrice: Number(product.salePrice),
+    };
   };
 
   export const update = async (
@@ -116,14 +125,16 @@ export namespace Products {
     return { success: true, data: updatedProduct };
   };
 
-  export const listAll = async (
-    storeId: number
-  ): Promise<(typeof productsTable.$inferSelect)[]> => {
+  export const listAll = async (storeId: number): Promise<ProductType[]> => {
     let products = await Drizzle.db
       .select()
       .from(productsTable)
       .where(eq(productsTable.storeId, storeId));
-    return products;
+    return products.map((x) => ({
+      ...x,
+      costPrice: Number(x.costPrice),
+      salePrice: Number(x.salePrice),
+    }));
   };
 
   export const remove = async (
@@ -137,5 +148,15 @@ export namespace Products {
       .delete(productsTable)
       .where(eq(productsTable.id, product.id));
     return { success: true, data: "OK" };
+  };
+
+  export const parse = (data: any): ProductType => {
+    let dateKeys = ["createdAt", "updatedAt"];
+    for (let key of dateKeys) data[key] = data[key].toString();
+
+    let numberKeys = ["costPrice", "salePrice"];
+    for (let key of numberKeys) data[key] = Number(data[key]);
+
+    return ProductSchema.parse(data);
   };
 }

@@ -7,9 +7,9 @@ export type ApiResponse<T = any> = {
 };
 
 export namespace HttpResponse {
-  export const success = <T = string>(data?: T): ApiResponse<T | string> => {
+  export const success = <T>(data?: T): ApiResponse<T> => {
     return {
-      data: data ?? "OK",
+      data: (data ?? "OK") as T,
     };
   };
 

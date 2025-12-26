@@ -1,5 +1,4 @@
 import { CoProductForm, CoSafeContainer } from "@/components";
-import { Palette } from "@/styles/pallete";
 import { Stack } from "expo-router";
 
 
@@ -10,11 +9,7 @@ export default function CreateProduct() {
 	}}>
 		<Stack.Screen
 			options={{
-				title: "Create a product",
-				headerStyle: {
-					backgroundColor: Palette.backgroundPrimary,
-				},
-				headerTintColor: 'white',
+				title: "Create a product"
 			}}
 		/>
 		<CoProductForm type="create"/>

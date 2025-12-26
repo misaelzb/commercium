@@ -7,6 +7,7 @@ import { userRoutes } from "./routes/users";
 import { storeRoutes } from "./routes/store";
 import { cors } from "hono/cors";
 
+
 const app = new Hono();
 
 const routes = app

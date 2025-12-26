@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
 import { router, Stack } from "expo-router";
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
 	container: {

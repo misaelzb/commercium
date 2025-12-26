@@ -8,7 +8,7 @@ import { router } from "expo-router";
 type CoProductCardProps = {
   data: Products.ProductType;
   handleEdit: (sku: string, data: Products.ProductCreateType) => void;
-  deleteModalState: [
+  selectedProductState: [
     Products.ProductType | null,
     (value: Products.ProductType | null) => void
   ]; // null = not selected / not showing modal
@@ -16,9 +16,9 @@ type CoProductCardProps = {
 export function CoProductCard({
   data: product,
   handleEdit,
-  deleteModalState,
+  selectedProductState,
 }: CoProductCardProps) {
-  const [deleteId, setSelected] = deleteModalState;
+  const [selectedProduct, setSelectedProduct] = selectedProductState;
   return (
     <>
       <CoCard style={[styles.productCard]}>
@@ -50,7 +50,7 @@ export function CoProductCard({
                 name="trash"
                 size={20}
                 color={"red"}
-                onPress={() => setSelected(product)}
+                onPress={() => setSelectedProduct(product)}
               />
               <Ionicons
                 name="pencil"
@@ -92,8 +92,9 @@ const styles = StyleSheet.create({
     color: "#868686ff",
   },
   productCard: {
-    backgroundColor: "#fafafaff",
+    backgroundColor: "#ffffffff",
     margin: 0,
+    elevation: 1
   },
   productActions: {
     flexDirection: "row",

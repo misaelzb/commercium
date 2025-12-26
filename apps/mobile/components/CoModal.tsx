@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Modal, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Modal, TouchableWithoutFeedback, Pressable } from "react-native";
 import { CoCard } from "./CoCard";
 
 interface CoModalProps {
@@ -9,25 +9,25 @@ interface CoModalProps {
 }
 
 export const CoModal = ({ children, visible, onClose }: CoModalProps) => {
-	return (
-		<Modal
-			animationType="fade"
-			transparent={true}
-			visible={visible}
-			onRequestClose={onClose}
-			statusBarTranslucent={true}
-		>
-			<TouchableWithoutFeedback onPress={onClose}>
-				<View style={styles.modalContainer}>
-					<TouchableWithoutFeedback>
-						<CoCard style={styles.centeredView}>
-							{children}
-						</CoCard>
-					</TouchableWithoutFeedback>
-				</View>
-			</TouchableWithoutFeedback>
-		</Modal>
-	);
+  return (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      statusBarTranslucent={true}
+    >
+      <Pressable style={styles.modalContainer} onPress={onClose}>
+        <Pressable onPress={(e) => e.stopPropagation()}> 
+           <View style={styles.centeredView}>
+              <CoCard>
+                {children}
+              </CoCard>
+           </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({

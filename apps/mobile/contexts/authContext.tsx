@@ -6,6 +6,7 @@ import {
 } from "@/services";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ApiResponse, Store, User } from "@commercium/core";
+import { storeDataApiParse } from "@/util";
 
 interface AuthContextType {
   currentUser: (User.InfoType & { stores: Store.StoreType[] }) | null;
@@ -58,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
           setAuthToken(token);
           console.log(sJson);
-          setStores(sJson.data as Store.StoreType[]);
+          setStores(sJson.data!.map(storeDataApiParse));
           setUser(json.data);
         } else {
           // user session is expired

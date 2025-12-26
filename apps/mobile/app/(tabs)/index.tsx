@@ -3,8 +3,7 @@ import { useAuth } from '@/contexts';
 import { Palette } from '@/styles/pallete';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
-import { View, Text, StyleSheet, Modal, Alert, Pressable, ScrollView } from 'react-native';
-import { BlurView } from "expo-blur"
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { client } from '@/services';
 import { router } from 'expo-router';
 import { Store } from '@commercium/core';
@@ -57,8 +56,8 @@ export default function HomeTab() {
 
   const handleDeleteStore = async () => {
     setLoading(true);
-    let response = await client.api.stores[':id'].$delete({
-      param: { id: storePressedId.toString() }
+    let response = await client.api.stores[':storeId'].$delete({
+      param: { storeId: storePressedId.toString() }
     }, {
       headers: authHeader
     });

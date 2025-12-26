@@ -4,15 +4,15 @@ import { storeTable } from "./store.sql";
 import { eq } from "drizzle-orm";
 import type { DBQueryResponse } from "..";
 import { productsTable } from "./products/products.sql";
+import { dateValue } from "../../util/specialTypes";
 
 export namespace Store {
   export const StoreSchema = z.object({
     id: z.number(),
     name: z.string().min(3).max(35),
     description: z.string().min(3).max(50).optional().nullable().default(null),
-    // logoURL: z.url().optional()
     ownerId: z.number(),
-    createdAt: z.iso.datetime().default(() => new Date().toISOString()),
+    createdAt: dateValue(),
   });
 
   export type StoreType = z.infer<typeof StoreSchema>;

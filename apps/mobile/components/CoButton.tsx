@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   Text,
+  TextProps,
   TouchableOpacityProps,
 } from "react-native";
 import { TouchableOpacity } from "react-native";
@@ -10,12 +11,14 @@ import { CoText } from "./CoText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 interface CoButtonProps extends TouchableOpacityProps {
-  text: string;
+  text?: string;
   onPress?: () => void;
   disabled?: boolean;
   isLoading?: boolean;
   icon?: string | null;
   type?: "primary" | "secondary" | "danger";
+  textStyle?: TextProps["style"];
+  iconSize?: number;
 }
 
 const styles = StyleSheet.create({
@@ -37,6 +40,8 @@ const styles = StyleSheet.create({
 export const CoButton = ({
   text: title,
   onPress,
+  textStyle,
+  iconSize,
   disabled = false,
   isLoading = false,
   icon = null,
@@ -56,14 +61,15 @@ export const CoButton = ({
       style={[
         styles.button,
         { backgroundColor: isDisabled ? "gray" : colors[type ?? "primary"] },
+        props.style
       ]}
     >
       {isLoading ? (
-        <ActivityIndicator size="small" color="white" />
+        <ActivityIndicator color="white" />
       ) : (
         <>
-          {icon && <Ionicons name={icon as any} size={20} color="white" />}
-          <CoText style={styles.buttonText}>{title.toUpperCase()}</CoText>
+          {icon && <Ionicons name={icon as any} size={iconSize ?? 20} color="white" />}
+          {title && <CoText style={[styles.buttonText, textStyle]}>{title.toUpperCase()}</CoText>}
         </>
       )}
     </TouchableOpacity>
