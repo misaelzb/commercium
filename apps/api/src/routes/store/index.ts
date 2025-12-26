@@ -14,6 +14,7 @@ import {
 import z from "zod";
 import { productRoutes } from "./products";
 import { salesRoutes } from "./sales";
+import { storeCheckMiddleware } from "../../middlewares/store";
 
 export const storeRoutes = new Hono<StoreContext>()
   .use("*", authMiddleware)
@@ -116,6 +117,7 @@ export const storeRoutes = new Hono<StoreContext>()
   )
   .delete(
     "/:storeId",
+    storeCheckMiddleware,
     describeRoute({
       tags: ["Store"],
       description: "Delete a store",
@@ -136,6 +138,47 @@ export const storeRoutes = new Hono<StoreContext>()
       }
 
       await Store.remove(parseInt(id));
+      return c.json(HttpResponse.success("OK"));
+    }
+  )
+  .put("/:storeId", 
+    describeRoute({
+      tags: ["Store"],
+      description: "Update a store",
+      parameters: [AuthHeaderParameter, StoreIdParameter],
+      responses: {
+        200: {
+          description: "Store updated",
+          content: {
+            "application/json": {
+              schema: resolver(
+                z.object({
+                  data: "OK",
+                })
+              ),
+            },
+          },
+        },
+        400: ErrorResponses[400],
+      },
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: {
+                name: "My store",
+                description: "My store description",
+              },
+            },
+          },
+        },
+      },
+    }),
+    zValidator("json", Store.StoreCreateSchema, (result, c) => {
+      if (!result.success) return handleInvalidBody(result.error, c);
+    }),
+    async (c) => {
+      await Store.update(parseInt(c.req.param("storeId")), c.req.valid("json"));
       return c.json(HttpResponse.success("OK"));
     }
   )

@@ -6,12 +6,14 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { userRoutes } from "./routes/users";
 import { storeRoutes } from "./routes/store";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 
 
 const app = new Hono();
 
 const routes = app
   .use(cors())
+  .use(logger())
   .route("/api/auth", authRoutes)
   .route("/api/users", userRoutes)
   .route("/api/stores", storeRoutes) // Includes routes related to products

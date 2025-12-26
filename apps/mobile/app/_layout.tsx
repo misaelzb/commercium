@@ -24,7 +24,7 @@ const RootStack = () => {
     headerTintColor: 'white',
   }}>
     {currentUser ? (
-      <Stack.Screen name="(tabs)/index" />
+      <Stack.Screen name="(tabs)" />
     ) : (
       <Stack.Screen name="/auth/index" options={{ animation: 'fade' }} />
     )}

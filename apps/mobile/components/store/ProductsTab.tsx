@@ -3,6 +3,8 @@ import CoButton from "../CoButton";
 import { Products } from "@commercium/core";
 import { CoProductCard } from "../products/CoProductCard";
 import { FlatList, View } from "react-native";
+import { CoCard } from "../CoCard";
+import { CoText } from "../CoText";
 
 export const ProductsTab = ({
   products,
@@ -26,6 +28,15 @@ export const ProductsTab = ({
         icon="add"
         onPress={() => router.push(`/store/${storeId}/product/create`)}
       />
+      {products.length === 0 && <View>
+        <CoCard>
+          <CoText asTitle>🤔 No products yet</CoText>
+          <CoText>
+            Take full advantage of Commercium by adding your first product!
+          </CoText>
+
+        </CoCard>  
+      </View>}
       <FlatList
         data={products}
         renderItem={({ item }) => {
@@ -33,7 +44,6 @@ export const ProductsTab = ({
             <CoProductCard
               key={item.id}
               data={item}
-              handleEdit={onEdit}
               selectedProductState={selectedProductState}
             />
           );

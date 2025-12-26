@@ -8,13 +8,12 @@ import { dateValue } from "../../../util/specialTypes";
 export namespace Products {
   export const ProductSchema = z.object({
     id: z.number(),
-    sku: z.string().min(3).max(255),
+    sku: z.string().min(3).max(255).regex(/^[A-Za-z0-9-]+$/g),
     description: z.string().min(3).max(255).nonempty(),
     costPrice: z.number(),
     salePrice: z.number(),
     storeId: z.number(),
     stock: z.number().default(0),
-    isActive: z.boolean().default(true),
     createdAt: dateValue(),
     updatedAt: dateValue(),
   });
@@ -50,6 +49,7 @@ export namespace Products {
       .insert(productsTable)
       .values({
         ...data,
+        sku: data.sku.toUpperCase(),
         storeId,
         costPrice: data.costPrice.toFixed(2),
         salePrice: data.salePrice.toFixed(2),
@@ -112,7 +112,6 @@ export namespace Products {
     if (data.description !== undefined)
       updatePayload.description = data.description;
     if (data.stock !== undefined) updatePayload.stock = data.stock;
-    if (data.isActive !== undefined) updatePayload.isActive = data.isActive;
     updatePayload.updatedAt = new Date();
 
     await Drizzle.db

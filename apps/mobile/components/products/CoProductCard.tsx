@@ -1,13 +1,13 @@
-import { Image, StyleSheet, Switch, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import { CoText } from "../CoText";
 import { CoCard } from "../CoCard";
 import { Products } from "@commercium/core";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
+import CoButton from "../CoButton";
 
 type CoProductCardProps = {
   data: Products.ProductType;
-  handleEdit: (sku: string, data: Products.ProductCreateType) => void;
   selectedProductState: [
     Products.ProductType | null,
     (value: Products.ProductType | null) => void
@@ -15,7 +15,6 @@ type CoProductCardProps = {
 };
 export function CoProductCard({
   data: product,
-  handleEdit,
   selectedProductState,
 }: CoProductCardProps) {
   const [selectedProduct, setSelectedProduct] = selectedProductState;
@@ -41,20 +40,27 @@ export function CoProductCard({
             <CoText numberOfLines={1} style={[styles.productSKU]}>
               {product.sku}
             </CoText>
-
-            <CoText>${product.salePrice}</CoText>
+            <View style={styles.productQInfo}>
+              <CoText style={styles.productPrice}>
+                ${product.salePrice.toFixed(2)}
+              </CoText>
+              <CoText asLabel style={product.stock === 0 ? { color: "red" } : {}}>(stock: {product.stock})</CoText>
+            </View>
           </View>
           <View>
             <View style={[styles.productActions]}>
-              <Ionicons
-                name="trash"
-                size={20}
-                color={"red"}
+              <CoButton
+                icon={"trash"}
+                iconSize={18}
+                type="danger"
+                style={{ padding: 5 }}
                 onPress={() => setSelectedProduct(product)}
               />
-              <Ionicons
-                name="pencil"
-                size={20}
+              <CoButton
+                icon={"pencil"}
+                iconSize={18}
+                type="secondary"
+                style={{ padding: 5 }}
                 onPress={() =>
                   router.push(
                     `/store/${product.storeId}/product/${product.sku}`
@@ -62,15 +68,6 @@ export function CoProductCard({
                 }
               />
             </View>
-            <Switch
-              value={product.isActive}
-              onValueChange={(value) =>
-                handleEdit(product.sku, {
-                  ...product,
-                  isActive: value,
-                })
-              }
-            />
           </View>
         </View>
       </CoCard>
@@ -94,10 +91,18 @@ const styles = StyleSheet.create({
   productCard: {
     backgroundColor: "#ffffffff",
     margin: 0,
-    elevation: 1
+    elevation: 1,
   },
   productActions: {
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 10,
+  },
+  productPrice: {
+    fontSize: 17,
+    fontWeight: "400",
+  },
+  productQInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });

@@ -16,6 +16,7 @@ interface AuthContextType {
   signIn: (data: User.LoginData) => Promise<ApiResponse>;
   signOut: () => Promise<void>;
   revalidateUser: () => Promise<void>;
+  fetchStores: () => Promise<Store.StoreType[]>;
 }
 
 //@ts-ignore
@@ -102,6 +103,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return json as ApiResponse;
   };
 
+  const fetchStores = async (): Promise<Store.StoreType[]> => {
+    let response = await client.api.stores.list.$get({}, { headers: authHeader });
+    let json = await response.json();
+    if (json.error) throw new Error(json.error);
+    setStores(json.data!.map(storeDataApiParse));
+    return json.data!.map(storeDataApiParse);
+  }
+
   const signIn = async ({ username, password }: User.LoginData) => {
     let response = await client.api.auth.login.$post(
       {
@@ -143,6 +152,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signOut,
         authHeader,
         revalidateUser,
+        fetchStores
       }}
     >
       {children}

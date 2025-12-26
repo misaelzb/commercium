@@ -191,7 +191,7 @@ export default function RegisterSale() {
                     />
                     <View style={[styles.dataContainer, styles.row]}>
                       <CoText style={styles.price}>
-                        ${data.details[i].unitPrice * data.details[i].quantity}
+                        ${(data.details[i].unitPrice * data.details[i].quantity).toFixed(2)}
                       </CoText>
 
                       <CoButton
@@ -221,7 +221,7 @@ export default function RegisterSale() {
                   {data.details.reduce(
                     (a, b) => a + b.unitPrice * b.quantity,
                     0
-                  )}
+                  ).toFixed(2)}
                 </CoText>
               </View>
 

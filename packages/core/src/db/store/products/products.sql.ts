@@ -22,7 +22,6 @@ export const productsTable = mysqlTable("products", {
     .notNull()
     .references(() => storeTable.id),
 
-  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

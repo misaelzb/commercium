@@ -11,7 +11,7 @@ export const CoIncrementInput = ({
 }: {
   number: number;
   onValueChange: (number: number) => void;
-  style: ViewProps['style']
+  style?: ViewProps['style']
 }) => {
 
   const handleIncrement = () => onValueChange(number + 1);

@@ -5,5 +5,5 @@ export const CoSeparator = () => {
 };
 
 const styles = StyleSheet.create({
-  separator: { borderColor: "#ccc", borderWidth: 1 },
+  separator: { borderColor: "#ccc", borderWidth: 1, marginVertical: 10 },
 });

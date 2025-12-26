@@ -7,7 +7,7 @@ export type ProductInputData = Omit<
   description: string;
   costPrice: string;
   salePrice: string;
-  stock: string;
+  stock: number;
 };
 
 export const productFormApiParse = (
@@ -26,7 +26,6 @@ export const productDataAsForm = (
   description: data.description || "",
   costPrice: data.costPrice.toString(),
   salePrice: data.salePrice.toString(),
-  stock: data.stock.toString(),
 });
 
 export const storeDataApiParse = (

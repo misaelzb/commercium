@@ -23,6 +23,7 @@ import { CoModal } from "@/components/CoModal";
 import { useStoreActions } from "@/hooks/useStoreActions";
 import SalesTab from "@/components/store/SalesTab";
 import Toast from "react-native-toast-message";
+import ConfigTab from "@/components/store/ConfigTab";
 
 export default function StoreHome() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -33,7 +34,7 @@ export default function StoreHome() {
   const storeId = params.storeId.toString();
   const {
     store,
-    fetchData: fetchStore,
+    fetchData,
     isActionLoading,
     deleteProduct,
     products,
@@ -41,6 +42,8 @@ export default function StoreHome() {
     fetchAnalytics,
     sales,
     salesAnalytics,
+    editStore,
+    deleteStore,
   } = useStoreActions(storeId);
 
   const Tabs = { PRODUCTS: 1, ANALYTICS: 0, CONFIG: 2 }; // to make code easier to understand.
@@ -69,10 +72,23 @@ export default function StoreHome() {
     setProductSelected(null);
   };
 
+  const onDeleteStore = async () => {
+    deleteStore()
+    .then(() => {
+      router.replace("/(tabs)");
+    })
+    .catch(() => {
+      Toast.show({
+        text1: "Failed to delete store",
+        type: "error",
+      });
+    })
+  }
+
   useFocusEffect(
     // every time screen is 'focused'
     useCallback(() => {
-      fetchStore()
+      fetchData()
       .then(() => {
         fetchAnalytics();
       })
@@ -99,7 +115,7 @@ export default function StoreHome() {
           <CoText>
             Are you sure you want to delete '{productSelected.description}'?
           </CoText>
-          <CoText>Statistics for this product may also be deleted.</CoText>
+          <CoText>Analytics for this product may also be deleted.</CoText>
           <View style={{ gap: 5 }}>
             <CoButton
               type="danger"
@@ -139,7 +155,11 @@ export default function StoreHome() {
         <View style={{ paddingBottom: 1 }}>
           <CoCard style={[styles.currentTab]}>
             {activeTabIndex === Tabs.ANALYTICS && (
-              <>{salesAnalytics ? <SalesTab sales={sales} analytics={salesAnalytics} /> : <CoLoadingContainer />}</>
+              <>{salesAnalytics ? <SalesTab 
+                  sales={sales} 
+                  analytics={salesAnalytics} 
+                  hasProducts={products.length > 0}
+                  /> : <CoLoadingContainer />}</>
             )}
             
             {activeTabIndex === Tabs.PRODUCTS && (
@@ -151,7 +171,12 @@ export default function StoreHome() {
             )}
             {
               activeTabIndex === Tabs.CONFIG && <>
-
+                <ConfigTab
+                  store={store}
+                  onEdit={editStore}
+                  onDelete={onDeleteStore}
+                  isActionLoading={isActionLoading}
+                />
               </>
             }
           </CoCard>
