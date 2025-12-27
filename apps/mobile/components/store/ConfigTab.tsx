@@ -70,7 +70,6 @@ export default function ConfigTab({
             text="Delete store"
             style={{ marginTop: 10 }}
             onPress={() => setOpen(true)}
-            isLoading={isActionLoading}
           />
         </View>
         <View style={styles.footer}>
