@@ -34,11 +34,6 @@ bun install
 bun run dev
 ```
 
-**Notas rápidas**
-- La app móvil usa `expo-router` para rutas (revisa `apps/mobile/app/_layout.tsx` y `apps/mobile/app/screens/`).
-- No se incluyen instrucciones de base de datos en este README; la configuración y migraciones están en `packages/core` por si las necesitas, pero no es obligatorio para arrancar la parte cliente/servidor en modo de desarrollo simple.
-- Evita anidar `NavigationContainer`; con `expo-router` usa `Stack` en `_layout.tsx`.
-
 **Comandos útiles (bun)**
 
 - Iniciar mobile (desde raíz):
