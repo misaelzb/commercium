@@ -13,7 +13,7 @@ const RootStack = () => {
   }
 
   return <Stack screenOptions={{
-    title: 'Commercium',
+    title: '',
     headerShown: true,
     headerStyle: {
       backgroundColor: Palette.backgroundPrimary,
@@ -22,6 +22,7 @@ const RootStack = () => {
       flex: 1, minHeight: 0
     },
     headerTintColor: 'white',
+    headerShadowVisible: false
   }}>
     {currentUser ? (
       <Stack.Screen name="(tabs)" />

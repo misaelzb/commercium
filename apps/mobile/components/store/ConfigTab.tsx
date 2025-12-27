@@ -6,6 +6,7 @@ import { useState } from "react";
 import CoButton from "../CoButton";
 import { CoSeparator } from "../CoSeparator";
 import { useStoreActions } from "@/hooks/useStoreActions";
+import { CoModal } from "../CoModal";
 
 export default function ConfigTab({
   store,
@@ -19,9 +20,33 @@ export default function ConfigTab({
   onDelete: () => void;
 }) {
   const [data, setData] = useState(store);
+  const [isOpen, setOpen] = useState(false);
 
   return (
     <>
+      <CoModal
+        visible={isOpen}
+        onClose={() => setOpen(false)}
+      >
+        <CoText asTitle>Delete store</CoText>
+        <CoText>
+          Are you sure you want to delete '{store.name}'?
+        </CoText>
+        <CoButton
+          type="danger"
+          onPress={() => {
+            onDelete(); // this must do router.back
+          }}
+          text="Yes, delete this store"
+          isLoading={isActionLoading}
+        />
+        <CoButton
+          type="secondary"
+          text="Cancel"
+          disabled={isActionLoading}
+          onPress={() => setOpen(false)}
+        />
+      </CoModal>
       <View style={{ flex: 1, gap: 20 }}>
         <View>
           <CoText asTitle>Store settings</CoText>
@@ -44,7 +69,7 @@ export default function ConfigTab({
             type="danger"
             text="Delete store"
             style={{ marginTop: 10 }}
-            onPress={onDelete}
+            onPress={() => setOpen(true)}
             isLoading={isActionLoading}
           />
         </View>

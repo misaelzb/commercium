@@ -12,4 +12,6 @@ export const Palette = {
 
   textPrimary: "#333333",
   textWhite: "#FFFFFF",
+
+  almostWhite: "#f5f4f4ff"
 };

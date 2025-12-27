@@ -10,12 +10,13 @@ import { Palette } from "@/styles/pallete";
 import { CoText } from "./CoText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
 interface CoButtonProps extends TouchableOpacityProps {
   text?: string;
   onPress?: () => void;
   disabled?: boolean;
   isLoading?: boolean;
-  icon?: string | null;
+  icon?: IconName;
   type?: "primary" | "secondary" | "danger";
   textStyle?: TextProps["style"];
   iconSize?: number;
@@ -42,9 +43,9 @@ export const CoButton = ({
   onPress,
   textStyle,
   iconSize,
+  icon,
   disabled = false,
   isLoading = false,
-  icon = null,
   type = "primary",
   ...props
 }: CoButtonProps) => {

@@ -2,6 +2,9 @@ import {
   CoButton,
   CoCard,
   CoCardTitle,
+  CoHero,
+  CoHeroImage,
+  CoHeroText,
   CoInput,
   CoSafeContainer,
   CoText,
@@ -10,9 +13,9 @@ import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { client } from "@/services";
-import { router, useFocusEffect } from "expo-router";
+import { router, Stack, useFocusEffect } from "expo-router";
 import { Store } from "@commercium/core";
 import { CoModal } from "@/components/CoModal";
 
@@ -91,17 +94,17 @@ export default function HomeTab() {
   useFocusEffect(
     useCallback(() => {
       fetchStores()
-      .then((stores) => {
-        setLocalStores(stores);
-      })
-      .catch(() => {
-        router.replace("/auth");
-      });
+        .then((stores) => {
+          setLocalStores(stores);
+        })
+        .catch(() => {
+          router.replace("/auth");
+        });
     }, [])
   );
 
   return (
-    <CoSafeContainer>
+    <>
       {createStoreModalVisible ? (
         <CoModal visible={createStoreModalVisible} onClose={toggleShowModal}>
           <CoText asTitle>Add your store</CoText>
@@ -170,67 +173,95 @@ export default function HomeTab() {
       ) : null}
 
       <ScrollView>
-        <CoCard style={styles.infoCard}>
-          <CoCardTitle white>Welcome {currentUser?.firstName}</CoCardTitle>
-          <CoText white>
-            Check how your stores are performing easily with commercium!
-          </CoText>
-        </CoCard>
-        <View>
-          <CoCardTitle style={{ margin: 10 }}>Your Stores</CoCardTitle>
-
-          <View style={styles.storesGrid}>
-            {localStores.map((store, arrIndex) => (
-              <CoCard
-                touchable
-                onLongPress={() => {
-                  setStorePressedId(store.id);
-                  setStorePressedName(store.name);
-                  toggleShowDeleteModal();
-                }}
-                onPress={() => {
-                  router.push(`/store/${store.id}`);
-                }}
-                key={arrIndex}
-                style={[styles.storeCard]}
-              >
-                <CoCardTitle white>{store.name}</CoCardTitle>
-                <CoText white style={{ textAlign: "center" }}>
-                  {store.description}
-                </CoText>
-              </CoCard>
-            ))}
+        <CoHero>
+          <CoHeroText>
+            <CoCardTitle white>Welcome {currentUser?.firstName}</CoCardTitle>
+            <CoText white>
+              Take total control of your business performance.
+            </CoText>
+            <CoText />
+          </CoHeroText>
+          <CoHeroImage
+            source={require("../../assets/images/white_chart.png")}
+          />
+        </CoHero>
+        <View style={styles.storesContainer}>
+          <CoText asTitle>My Stores</CoText>
+          {localStores.map((store, arrIndex) => (
             <CoCard
               touchable
-              onPress={toggleShowModal}
-              style={[styles.storeCard, styles.addCard]}
+              onLongPress={() => {
+                setStorePressedId(store.id);
+                setStorePressedName(store.name);
+                toggleShowDeleteModal();
+              }}
+              onPress={() => {
+                router.push(`/store/${store.id}`);
+              }}
+              key={arrIndex}
+              style={[styles.storeCard]}
             >
-              <Ionicons name="add" size={40} />
+              <View style={styles.storeIcon}>
+                <Ionicons name="storefront" color={"white"} size={30} />
+              </View>
+              <View style={styles.storeName}>
+                <CoText numberOfLines={2} white style={styles.storeNameText}>
+                  {store.name}
+                </CoText>
+              </View>
+              <View style={styles.storeDescription}>
+                <CoText white numberOfLines={2}>
+                  {store.description}
+                </CoText>
+              </View>
             </CoCard>
-          </View>
+          ))}
+          <CoCard
+            touchable
+            onPress={toggleShowModal}
+            style={[styles.storeCard, styles.addCard]}
+          >
+            <Ionicons name="add" size={40} />
+          </CoCard>
         </View>
       </ScrollView>
-    </CoSafeContainer>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  storesGrid: {
+  storesContainer: {
     flex: 1,
-    flexWrap: "wrap",
-    flexDirection: "row",
-    justifyContent: "flex-start",
     gap: 10,
+    backgroundColor: Palette.almostWhite,
+
+    top: -19,
+    borderRadius: 20,
+    padding: 20,
   },
-  infoCard: { backgroundColor: Palette.backgroundPrimary },
-  storeCard: {
-    backgroundColor: Palette.backgroundSecondary,
-    width: "48%",
-    height: "48%",
-    aspectRatio: 1,
+  storeIcon: {
+    flex: 0.15,
     justifyContent: "center",
     alignItems: "center",
-    padding: 10,
+  },
+  storeName: {
+    flex: 0.35,
+    fontSize: 18,
+  },
+  storeNameText: {
+    fontWeight: "600",
+    fontSize: 18,
+  },
+  storeDescription: {
+    flex: 0.5,
+  },
+  storeCard: {
+    backgroundColor: Palette.backgroundSecondary,
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   addCard: {
     backgroundColor: Palette.gray,

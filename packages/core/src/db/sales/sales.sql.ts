@@ -7,7 +7,7 @@ export const salesTable = mysqlTable("sales", {
   id: int("id").primaryKey().autoincrement(),
   storeId: int("store_id")
     .notNull()
-    .references(() => storeTable.id),
+    .references(() => storeTable.id, { onDelete: "cascade" }),
 
   label: varchar("label", { length: 255 }),
   total: decimal("total", { precision: 15, scale: 2 }).notNull(),
@@ -22,7 +22,7 @@ export const saleDetailsTable = mysqlTable("sale_details", {
     .references(() => salesTable.id),
   productId: int("product_id")
     .notNull()
-    .references(() => productsTable.id),
+    .references(() => productsTable.id, { onDelete: "cascade" }),
 
   quantity: int("quantity").notNull(),
   unitPrice: decimal("price", { precision: 15, scale: 2 }).notNull(), // unit price at moment of creation

@@ -20,7 +20,7 @@ export const productsTable = mysqlTable("products", {
 
   storeId: int("store_id")
     .notNull()
-    .references(() => storeTable.id),
+    .references(() => storeTable.id, { onDelete: "cascade" }),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

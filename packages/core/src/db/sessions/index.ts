@@ -4,6 +4,7 @@ import { sessionsTable } from "./sessions.sql";
 import { Drizzle } from "../../shared/drizzle";
 import { eq } from "drizzle-orm";
 import { User } from "../users";
+import { userTable } from "../users/users.sql";
 
 export namespace Session {
   export const SessionSchema = z.object({
@@ -30,20 +31,20 @@ export namespace Session {
   export const getUser = async (
     token: string
   ): Promise<User.InfoType | null> => {
-    const session = await Drizzle.db
+    const [data] = await Drizzle.db
       .select()
       .from(sessionsTable)
-      .where(eq(sessionsTable.token, token));
+      .where(eq(sessionsTable.token, token))
+      .leftJoin(userTable, eq(sessionsTable.userId, userTable.id));
 
-    if (!session[0]) return null;
-    if (session[0].expires < new Date()) {
+    if (!data || !data.sessions || !data.users) return null;
+    if (data.sessions.expires < new Date()) {
       await Drizzle.db
         .delete(sessionsTable)
         .where(eq(sessionsTable.token, token));
       return null;
     }
-    const user = await User.fetch(session[0].userId);
-    return user;
+    return User.parse(data.users);
   };
 
   export const remove = async (token: string) => {

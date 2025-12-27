@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import type { DBQueryResponse } from "..";
 import { productsTable } from "./products/products.sql";
 import { dateValue } from "../../util/specialTypes";
-import { salesTable } from "../sales/sales.sql";
+import { saleDetailsTable, salesTable } from "../sales/sales.sql";
 
 export namespace Store {
   export const StoreSchema = z.object({
@@ -34,7 +34,7 @@ export namespace Store {
       .insert(storeTable)
       .values({
         ...data,
-        description: data.description ?? "No description provided",
+        description: data.description ?? "No description",
         ownerId: userId,
       })
       .$returningId();
@@ -71,16 +71,7 @@ export namespace Store {
   export const remove = async (
     id: number
   ): Promise<DBQueryResponse<string>> => {
-    let promises = [
-      Drizzle.db.delete(salesTable).where(eq(salesTable.storeId, id)),
-      Drizzle.db.delete(productsTable).where(eq(productsTable.storeId, id)),
-    ]
-    
-    await Promise.all(promises);
-    await Drizzle.db.delete(storeTable).where(eq(storeTable.id, id))
-
-    
-
+    await Drizzle.db.delete(storeTable).where(eq(storeTable.id, id));
     return { success: true, data: "OK" };
   };
 
