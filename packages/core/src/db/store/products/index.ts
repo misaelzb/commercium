@@ -6,10 +6,22 @@ import type { DBQueryResponse } from "../..";
 import { dateValue } from "../../../util/specialTypes";
 
 export namespace Products {
+  const generateSKU = () => {
+    return `SKU-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+  };
   export const ProductSchema = z.object({
     id: z.number(),
-    sku: z.string().min(3).max(255).regex(/^[A-Za-z0-9-]+$/g),
-    description: z.string().min(3).max(255).nonempty(),
+    sku: z.preprocess(
+      (val: string) => (val === "" ? undefined : val.toUpperCase?.()),
+      z
+        .string()
+        .min(3)
+        .max(255)
+        .regex(/^[A-Za-z0-9-]+$/)
+        .optional()
+        .default(() => generateSKU())
+    ),
+    description: z.string().min(3).max(255),
     costPrice: z.number(),
     salePrice: z.number(),
     storeId: z.number(),

@@ -56,7 +56,9 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
 
   const handleSubmit = async () => {
 		setSuccessMsg("");
-    if (Object.values(data).some((x) => !x && x !== 0)) {
+    let { sku, ...requiredFields } = data;
+
+    if (Object.values(requiredFields).some((x) => !x && x !== 0)) {
       setErrors({ ...errors, global: "Make sure all fields are filled" });
       return;
     }
@@ -136,8 +138,8 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
       )}
       <CoSeparator />
       <CoInput
-        label="SKU"
-        placeholder="ABC-1234567-ZY"
+        label="SKU (optional)"
+        placeholder="e.g. ABC-1234567-ZY"
         onChangeText={(value) => updateInput("sku", value)}
         value={data.sku}
         error={errors.sku}

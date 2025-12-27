@@ -96,7 +96,7 @@ export default function SalesTab({
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <CoText style={styles.saleLabel}>
-                {item.label || "Sale #" + item.id}
+                {item.label || "Sale"}
               </CoText>
               <CoText style={styles.saleDate}>
                 {item.createdAt.toLocaleDateString()} • {item.details.length}{" "}
