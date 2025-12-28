@@ -15,6 +15,13 @@
       "when": 1766801609055,
       "tag": "0001_groovy_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766893339178,
+      "tag": "0002_clumsy_star_brand",
+      "breakpoints": true
     }
   ]
 }

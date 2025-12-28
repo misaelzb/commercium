@@ -8,7 +8,7 @@ import {
 import { useStoreActions } from "@/hooks/useStoreActions";
 import { Sales } from "@commercium/core";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Toast from "react-native-toast-message";
@@ -16,7 +16,8 @@ import Toast from "react-native-toast-message";
 export default function RegisterSale() {
   const params = useLocalSearchParams();
   const storeId = params.storeId.toString();
-  const { fetchData, products, registerSale, isActionLoading } = useStoreActions(storeId);
+  const { fetchData, products, registerSale, isActionLoading } =
+    useStoreActions(storeId);
 
   const [data, setData] = useState<Sales.SaleCreateType>({
     storeId: Number(storeId),
@@ -50,12 +51,25 @@ export default function RegisterSale() {
         products
           .sort((a, b) => a.description.localeCompare(b.description))
           .map((p) => ({
-            label: p.description,
+            label: p.description + " (" + p.stock + ")",
             value: p.id.toString(),
           }))
       );
     }
   }, [products]);
+
+  const stocksDisponibles = useMemo(() => {
+    const baseStocks: { [key: string]: number } = {};
+    for (const p of products) baseStocks[p.id] = p.stock;
+
+    data.details.forEach((detail) => {
+      const id = detail.productId?.toString();
+      if (id && detail.productId !== -1 && baseStocks[id] !== undefined) {
+        baseStocks[id] -= detail.quantity || 0;
+      }
+    });
+    return baseStocks;
+  }, [data.details, products]);
 
   const addNewItem = () => {
     let newItems = [...data.details];
@@ -92,14 +106,21 @@ export default function RegisterSale() {
     if (data.details.length === 0) {
       Toast.show({
         text1: "At least one product must be selected",
-        type: "error"
+        type: "error",
       });
       return;
     }
-    if (data.details.some(p => p.productId === -1)) {
+    if (data.details.some((p) => p.productId === -1)) {
       Toast.show({
         text1: "You cannot leave any product blank",
-        type: "error"
+        type: "error",
+      });
+      return;
+    }
+    if (data.details.some((p) => p.quantity === 0)) {
+      Toast.show({
+        text1: "You cannot leave any quantity as zero",
+        type: "error",
       });
       return;
     }
@@ -108,7 +129,7 @@ export default function RegisterSale() {
         if (success) {
           Toast.show({
             text1: "Sale registered successfully",
-            type: "success"
+            type: "success",
           });
           router.back();
         }
@@ -117,11 +138,11 @@ export default function RegisterSale() {
         Toast.show({
           text1: "Failed to register sale",
           text2: `${err}`,
-          type: "error"
+          type: "error",
         });
         console.error(err);
       });
-  }
+  };
 
   return (
     <>
@@ -151,22 +172,40 @@ export default function RegisterSale() {
                 <CoText style={styles.columnHeader}>Total</CoText>
               </View>
               {data.details.map((item, i) => {
-                let pid = data.details[i].productId?.toString();
+                let strProductId = item.productId.toString();
+                let product = products.find(
+                  (p) => p.id.toString() === strProductId
+                )!;
+                let availStock = product
+                  ? (stocksDisponibles[product.id] || 0) + (item.quantity || 0)
+                  : undefined;
+                let toastStockMessage = product && {
+                  text1: `Stock exceeded for ${product.description}`,
+                  text2: `There's only ${product.stock} units available for this sale`,
+                  type: "error",
+                };
                 return (
                   <View style={[styles.row]} key={i}>
                     <DropDownPicker
                       key={`${i}-product`}
                       open={openIndex === i}
-                      value={pid == "-1" ? null : pid}
+                      value={strProductId == "-1" ? null : strProductId}
                       items={pickableItems}
-                      setOpen={(v) => setOpenIndex(v ? i : null)}
-                      setValue={(cb) =>
+                      setOpen={(v) => {
+                        // maybe a typing error, because it's a boolean, not a function.
+                        //@ts-ignore
+                        setOpenIndex(v ? i : null)
+                      }}
+                      setValue={(cb) => {
+                        let newId = cb(item.productId.toString());
+                        let stock = stocksDisponibles[newId];
+                        updateItem(i, "productId", newId);
                         updateItem(
                           i,
-                          "productId",
-                          cb(data.details[i].productId?.toString())
-                        )
-                      }
+                          "quantity",
+                          stock !== undefined && (stock > 0 ? 1 : 0)
+                        );
+                      }}
                       placeholder="Select..."
                       containerStyle={styles.dataContainer}
                       labelProps={{
@@ -183,15 +222,19 @@ export default function RegisterSale() {
                     />
                     <CoIncrementInput
                       key={`${i}-quantity`}
-                      number={data.details[i]?.quantity ?? 0}
+                      number={item.quantity ?? 0}
                       onValueChange={(number) => {
-                        updateItem(i, "quantity", number);
+                        if (availStock !== undefined && number > availStock)
+                          Toast.show(toastStockMessage);
+                        else updateItem(i, "quantity", number);
                       }}
+                      max={availStock}
+                      onMaxReached={() => Toast.show(toastStockMessage)}
                       style={styles.dataContainer}
                     />
                     <View style={[styles.dataContainer, styles.row]}>
                       <CoText style={styles.price}>
-                        ${(data.details[i].unitPrice * data.details[i].quantity).toFixed(2)}
+                        ${(item.unitPrice * item.quantity).toFixed(2)}
                       </CoText>
 
                       <CoButton
@@ -218,10 +261,9 @@ export default function RegisterSale() {
                 <CoText asTitle>Total:</CoText>
                 <CoText asTitle style={styles.totalAmount}>
                   $
-                  {data.details.reduce(
-                    (a, b) => a + b.unitPrice * b.quantity,
-                    0
-                  ).toFixed(2)}
+                  {data.details
+                    .reduce((a, b) => a + b.unitPrice * b.quantity, 0)
+                    .toFixed(2)}
                 </CoText>
               </View>
 

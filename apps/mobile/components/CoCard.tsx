@@ -30,11 +30,11 @@ const styles = StyleSheet.create({
 export interface CoCardProps extends ViewProps {
   touchable?: boolean;
   onPress?: () => void;
-  onLongPress?: () => void; // Only use if touchable is true!
+  onLongPress?: () => void;
 }
 
 export const CoCard = function ({ children, ...props }: CoCardProps) {
-  if (props.touchable) {
+  if (props.touchable || props.onPress || props.onLongPress) {
     return (
       <TouchableOpacity
         onPress={props.onPress}

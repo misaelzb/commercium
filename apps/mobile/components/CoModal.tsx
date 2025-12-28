@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
 	centeredView: {
-		margin: 20,
+    margin: 20,
 	},
 });

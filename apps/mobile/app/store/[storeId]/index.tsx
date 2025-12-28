@@ -44,6 +44,7 @@ export default function StoreHome() {
     salesAnalytics,
     editStore,
     deleteStore,
+    deleteSale
   } = useStoreActions(storeId);
 
   const Tabs = { PRODUCTS: 1, ANALYTICS: 0, CONFIG: 2 }; // to make code easier to understand.
@@ -159,6 +160,8 @@ export default function StoreHome() {
                   sales={sales} 
                   analytics={salesAnalytics} 
                   hasProducts={products.length > 0}
+                  deleteSaleFn={deleteSale}
+                  isActionLoading={isActionLoading}
                   /> : <CoLoadingContainer />}</>
             )}
             

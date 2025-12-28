@@ -10,7 +10,7 @@ const parseProduct = (p: any): Products.ProductType => ({
   updatedAt: new Date(p.updatedAt),
 });
 
-const parseSale = (s: any): Sales.SalesListInfo => ({
+const parseSale = (s: any): Sales.SaleInfo => ({
   ...s,
   createdAt: new Date(s.createdAt),
   details: s.details.map((d: any) => ({
@@ -30,7 +30,7 @@ export const useStoreActions = (storeId: string) => {
   const { authHeader } = useAuth();
   const [products, setProducts] = useState<Products.ProductType[]>([]);
   const [store, setStore] = useState<Store.StoreType>();
-  const [sales, setSales] = useState<Sales.SalesListInfo[]>([]);
+  const [sales, setSales] = useState<Sales.SaleInfo[]>([]);
   const [isActionLoading, setActionLoading] = useState(false);
   const [salesAnalytics, setSalesAnalytics] = useState<Sales.AnalyticsReport>();
 
@@ -252,6 +252,7 @@ export const useStoreActions = (storeId: string) => {
       console.log(res);
       if (res.ok) {
         await fetchData({ sales: true });
+        await fetchAnalytics();
         return true;
       } else {
         const json = await res.json();
@@ -311,6 +312,35 @@ export const useStoreActions = (storeId: string) => {
     }
   };
 
+  const deleteSale = async (id: number) => {
+    setActionLoading(true);
+    try {
+      const res = await client.api.stores[":storeId"].sales[":saleId"].$delete(
+        {
+          param: { storeId, saleId: id.toString() },
+        },
+        { headers: authHeader }
+      );
+      if (res.ok) {
+        setSales((prev) => prev.filter((s) => s.id !== id));
+        await fetchAnalytics();
+        Toast.show({
+          text1: "Sale deleted successfully",
+          type: "success",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      Toast.show({
+        text1: "Failed to delete sale",
+        type: "error",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+
   return {
     products,
     store,
@@ -324,6 +354,7 @@ export const useStoreActions = (storeId: string) => {
     editProduct,
     registerSale,
     isActionLoading,
-    deleteStore
+    deleteStore,
+    deleteSale
   };
 };

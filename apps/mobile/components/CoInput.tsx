@@ -27,7 +27,7 @@ export default function CoInput({
 
       <View style={[styles.inputWrapper]}>
         {prefix && <Text style={styles.prefix}>{prefix}</Text>}
-        <TextInput style={[styles.input, style]} {...props} />
+        <TextInput style={[styles.input, style]} {...props} placeholderTextColor={"#8a8a8aff"}/>
       </View>
       {error && <Text style={styles.error}>{error}</Text>}
     </View>

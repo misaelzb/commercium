@@ -11,6 +11,7 @@ import {
   StoreIdParameter,
 } from "../../util";
 import z from "zod";
+import { SaleIdParameter } from "../../util/commonData";
 
 export const salesRoutes = new Hono<StoreContext>()
   .use("*", storeCheckMiddleware)
@@ -97,7 +98,7 @@ export const salesRoutes = new Hono<StoreContext>()
             "application/json": {
               schema: resolver(
                 z.object({
-                  data: z.array(Sales.SaleListSchema),
+                  data: z.array(Sales.SaleInfoSchema),
                 })
               ),
             },
@@ -138,5 +139,83 @@ export const salesRoutes = new Hono<StoreContext>()
       let report = await Sales.generateAnalyticsReport(store.id);
 
       return c.json(HttpResponse.success(report));
+    }
+  )
+  .get(
+    "/:saleId",
+    describeRoute({
+      tags: ["Sales"],
+      description: "Get a sale by ID",
+      parameters: [
+        AuthHeaderParameter,
+        StoreIdParameter,
+        SaleIdParameter,
+      ],
+      responses: {
+        200: {
+          description: "Sale found",
+          content: {
+            "application/json": {
+              schema: resolver(
+                z.object({
+                  data: Sales.SaleInfoSchema,
+                })
+              ),
+            },
+          },
+        },
+        404: ErrorResponses[404],
+      },
+    }),
+    async (c) => {
+      let store = c.get("store");
+      let id = c.req.param("saleId");
+      let sale = await Sales.fetch(store.id, parseInt(id));
+
+      if (!sale) {
+        c.status(404);
+        return c.json(HttpResponse.notFound());
+      }
+
+      return c.json(HttpResponse.success(sale));
+    }
+  )
+  .delete(
+    "/:saleId",
+    describeRoute({
+      tags: ["Sales"],
+      description: "Delete a sale by ID",
+      parameters: [
+        AuthHeaderParameter,
+        StoreIdParameter,
+        SaleIdParameter
+      ],
+      responses: {
+        200: {
+          description: "Sale deleted",
+          content: {
+            "application/json": {
+              schema: resolver(
+                z.object({
+                  data: z.string("OK"),
+                })
+              ),
+            },
+          },
+        },
+        404: ErrorResponses[404],
+      },
+    }),
+    async (c) => {
+      let store = c.get("store");
+      let id = c.req.param("saleId");
+
+      let res = await Sales.remove(store.id, parseInt(id));
+      if (!res.success) {
+        c.status(404);
+        return c.json(HttpResponse.notFound());
+      }
+
+      return c.json(HttpResponse.success("OK"))
     }
   );

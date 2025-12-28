@@ -5,6 +5,9 @@ import { Products } from "@commercium/core";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import CoButton from "../CoButton";
+import { Dimensions } from "react-native";
+const windowWidth = Dimensions.get("window").width;
+const isWide = windowWidth >= 600;
 
 type CoProductCardProps = {
   data: Products.ProductType;
@@ -13,6 +16,7 @@ type CoProductCardProps = {
     (value: Products.ProductType | null) => void
   ]; // null = not selected / not showing modal
 };
+
 export function CoProductCard({
   data: product,
   selectedProductState,
@@ -22,13 +26,9 @@ export function CoProductCard({
     <>
       <CoCard style={[styles.productCard]}>
         <View style={[styles.productInfoContainer]}>
-          <Image
-            source={{
-              uri: "https://placehold.co/400x400/cccccc/969696.png?font=lato",
-              width: 75,
-              height: 75,
-            }}
-          />
+          <Ionicons 
+            style={{ alignSelf: "center", marginRight: 10 }}
+            name="cube" size={40} color="black" />
           <View style={{ flex: 1, justifyContent: "space-between" }}>
             <CoText
               numberOfLines={1}
@@ -92,6 +92,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffffff",
     margin: 0,
     elevation: 1,
+    width: isWide ? "49%" : "99%",
+    alignSelf: "center",
   },
   productActions: {
     flexDirection: "column",

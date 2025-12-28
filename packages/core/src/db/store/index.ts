@@ -34,7 +34,6 @@ export namespace Store {
       .insert(storeTable)
       .values({
         ...data,
-        description: data.description ?? "No description",
         ownerId: userId,
       })
       .$returningId();

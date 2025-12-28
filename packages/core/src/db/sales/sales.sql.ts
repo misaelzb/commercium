@@ -19,7 +19,7 @@ export const saleDetailsTable = mysqlTable("sale_details", {
   id: int("id").primaryKey().autoincrement(),
   saleId: int("sale_id")
     .notNull()
-    .references(() => salesTable.id),
+    .references(() => salesTable.id, { onDelete: "cascade" }),
   productId: int("product_id")
     .notNull()
     .references(() => productsTable.id, { onDelete: "cascade" }),

@@ -64,3 +64,14 @@ export const ProductSKUParameter: any = {
     type: "string",
   },
 };
+
+export const SaleIdParameter: any = {
+  name: "saleId",
+  in: "path",
+  description: "ID of the sale",
+  required: true,
+  schema: {
+    type: "number",
+    example: 1,
+  },
+};

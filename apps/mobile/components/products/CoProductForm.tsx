@@ -18,11 +18,15 @@ import { Products } from "@commercium/core";
 import { CoIncrementInput } from "../CoIncrementInput";
 import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Dimensions } from 'react-native';
 
 interface CoProductFormProps {
   type: "create" | "edit";
   initialProduct?: Products.ProductType;
 }
+
+const windowWidth = Dimensions.get('window').width;
+const isWide = windowWidth >= 600;
 
 export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
   const { authHeader } = useAuth();
@@ -112,7 +116,7 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
   };
 
   return (
-    <CoCard>
+    <CoCard style={styles.formContainer}>
       <CoCardTitle style={{ textAlign: "center" }}>Product Details</CoCardTitle>
       {(errors.global || successMsg) && (
         <View
@@ -202,6 +206,11 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
 };
 
 const styles = StyleSheet.create({
+  formContainer: {
+    backgroundColor: Palette.almostWhite,
+    width: isWide ? "48%" : "95%",
+    alignSelf: "center",
+  },
   msgContainer: {
 		flexDirection: "row",
 		justifyContent: "center",

@@ -7,14 +7,20 @@ import { CoText } from "./CoText";
 export const CoIncrementInput = ({
   number,
   onValueChange,
-  style
+  style,
+  max,
+  onMaxReached,
 }: {
   number: number;
   onValueChange: (number: number) => void;
-  style?: ViewProps['style']
+  style?: ViewProps['style'];
+  max?: number;
+  onMaxReached?: () => void;
 }) => {
-
-  const handleIncrement = () => onValueChange(number + 1);
+  const handleIncrement = () => {
+    if (max !== undefined && number + 1 > max) return onMaxReached?.();
+    onValueChange(number + 1);
+  }
   const handleDecrement = () => onValueChange(number - 1 < 0 ? 0 : number - 1);
 
   return (

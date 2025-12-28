@@ -1,11 +1,12 @@
 import z from "zod";
 import { Drizzle } from "../../shared/drizzle";
 import { saleDetailsTable, salesTable } from "./sales.sql";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { DBQueryResponse } from "..";
 import { dateValue } from "../../util/specialTypes";
 import { productsTable } from "../store/products/products.sql";
 import { Products } from "../store/products";
+import type { DbQueryResponse } from "../../..";
 
 export namespace Sales {
   export const SaleSchema = z.object({
@@ -84,10 +85,17 @@ export namespace Sales {
         unitPrice: detail.unitPrice.toFixed(2),
       }))
     );
+    // update stocks
+    for (const detail of data.details) {
+      await Drizzle.db
+        .update(productsTable)
+        .set({ stock: sql`${productsTable.stock} - ${detail.quantity}` })
+        .where(eq(productsTable.id, detail.productId));
+    }
     return { success: true, data: sale };
   };
 
-  export const SaleListSchema = z.object({
+  export const SaleInfoSchema = z.object({
     id: z.number(),
     storeId: z.number(),
     label: z.string().nullable(),
@@ -103,7 +111,7 @@ export namespace Sales {
     ),
   });
 
-  export type SalesListInfo = {
+  export type SaleInfo = {
     id: number;
     storeId: number;
     label: string | null;
@@ -118,45 +126,45 @@ export namespace Sales {
     }[];
   };
 
-  export const listAll = async (storeId: number): Promise<SalesListInfo[]> => {
-  const rows = await Drizzle.db
-    .select({
-      sale: salesTable,
-      detail: saleDetailsTable,
-      product: productsTable,
-    })
-    .from(salesTable)
-    .where(eq(salesTable.storeId, storeId))
-    .leftJoin(saleDetailsTable, eq(salesTable.id, saleDetailsTable.saleId))
-    .leftJoin(productsTable, eq(saleDetailsTable.productId, productsTable.id))
-    .orderBy(desc(salesTable.createdAt))
-    .limit(10);
+  export const listAll = async (storeId: number): Promise<SaleInfo[]> => {
+    const rows = await Drizzle.db
+      .select({
+        sale: salesTable,
+        detail: saleDetailsTable,
+        product: productsTable,
+      })
+      .from(salesTable)
+      .where(eq(salesTable.storeId, storeId))
+      .leftJoin(saleDetailsTable, eq(salesTable.id, saleDetailsTable.saleId))
+      .leftJoin(productsTable, eq(saleDetailsTable.productId, productsTable.id))
+      .orderBy(desc(salesTable.createdAt))
+      .limit(10);
 
-  const finalSales: SalesListInfo[] = [];
+    const finalSales: SaleInfo[] = [];
 
-  for (const row of rows) {
-    const { sale, detail, product } = row;
+    for (const row of rows) {
+      const { sale, detail, product } = row;
 
-    let saleEntry = finalSales.find((s) => s.id === sale.id);
+      let saleEntry = finalSales.find((s) => s.id === sale.id);
 
-    if (!saleEntry) {
-      saleEntry = {
-        ...sale,
-        details: [],
-      };
-      finalSales.push(saleEntry);
+      if (!saleEntry) {
+        saleEntry = {
+          ...sale,
+          details: [],
+        };
+        finalSales.push(saleEntry);
+      }
+
+      if (detail) {
+        saleEntry.details.push({
+          ...detail,
+          product: Products.parse(product),
+        });
+      }
     }
 
-    if (detail) {
-      saleEntry.details.push({
-        ...detail,
-        product: Products.parse(product),
-      });
-    }
-  }
-
-  return finalSales;
-};
+    return finalSales;
+  };
 
   export const AnalyticsReportSchema = z.object({
     period: z.string(),
@@ -175,7 +183,9 @@ export namespace Sales {
 
   export type AnalyticsReport = z.infer<typeof AnalyticsReportSchema>;
 
-  export const generateAnalyticsReport = async (storeId: number): Promise<AnalyticsReport> => {
+  export const generateAnalyticsReport = async (
+    storeId: number
+  ): Promise<AnalyticsReport> => {
     const allSales = await listAll(storeId);
 
     const now = new Date();
@@ -227,7 +237,60 @@ export namespace Sales {
       revenue,
       profit,
       averageOrderValue: totalSales ? revenue / totalSales : 0,
-      topProducts
+      topProducts,
     };
+  };
+
+  export const fetch = async (
+    storeId: number,
+    id: number
+  ): Promise<SaleInfo | null> => {
+    const rows = await Drizzle.db
+      .select()
+      .from(salesTable)
+      .where(and(eq(salesTable.id, id), eq(salesTable.storeId, storeId)))
+      .leftJoin(saleDetailsTable, eq(salesTable.id, saleDetailsTable.saleId))
+      .leftJoin(
+        productsTable,
+        eq(saleDetailsTable.productId, productsTable.id)
+      );
+
+    if (!rows[0]) return null;
+
+    // Tomamos la info de la venta de la primera fila
+    const firstRow = rows[0].sales;
+
+    const result: SaleInfo = {
+      id: firstRow.id,
+      storeId: firstRow.storeId,
+      label: firstRow.label,
+      total: firstRow.total,
+      createdAt: firstRow.createdAt,
+      // Mapeamos las filas para extraer solo los detalles
+      details: rows
+        .filter((row) => row.sale_details !== null) // Filtramos por si no hay detalles
+        .map((row) => ({
+          id: row.sale_details!.id,
+          productId: row.sale_details!.productId,
+          quantity: row.sale_details!.quantity,
+          unitPrice: row.sale_details!.unitPrice,
+          product: Products.parse(row.products), // Aquí va la data del producto unido
+        })),
+    };
+
+    return result;
+  };
+
+  export const remove = async (
+    storeId: number,
+    id: number
+  ): Promise<DbQueryResponse<string>> => {
+    const result = await Drizzle.db
+      .delete(salesTable)
+      .where(and(eq(salesTable.id, id), eq(salesTable.storeId, storeId)))
+      .then((r) => ({ success: true }))
+      .catch((e) => ({ success: false, errorDetail: e.message }));
+      
+    return result;
   };
 }

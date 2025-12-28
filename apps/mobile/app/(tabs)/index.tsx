@@ -6,18 +6,21 @@ import {
   CoHeroImage,
   CoHeroText,
   CoInput,
-  CoSafeContainer,
   CoText,
 } from "@/components";
 import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import { View, StyleSheet, ScrollView} from "react-native";
 import { client } from "@/services";
-import { router, Stack, useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Store } from "@commercium/core";
 import { CoModal } from "@/components/CoModal";
+
+import { Dimensions } from 'react-native';
+const windowWidth = Dimensions.get('window').width;
+const isWide = windowWidth >= 600;
 
 export default function HomeTab() {
   const { currentUser, authHeader, fetchStores } = useAuth();
@@ -186,7 +189,7 @@ export default function HomeTab() {
           />
         </CoHero>
         <View style={styles.storesContainer}>
-          <CoText asTitle>My Stores</CoText>
+          <CoText asTitle style={{ width: "100%" }}>My Stores</CoText>
           {localStores.map((store, arrIndex) => (
             <CoCard
               touchable
@@ -221,7 +224,7 @@ export default function HomeTab() {
             onPress={toggleShowModal}
             style={[styles.storeCard, styles.addCard]}
           >
-            <Ionicons name="add" size={40} />
+            <Ionicons name="add" size={30} />
           </CoCard>
         </View>
       </ScrollView>
@@ -232,12 +235,15 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
   storesContainer: {
     flex: 1,
-    gap: 10,
     backgroundColor: Palette.almostWhite,
-
     top: -19,
     borderRadius: 20,
     padding: 20,
+    gap: 10,
+
+    flexDirection: 'row',    
+    flexWrap: 'wrap',  
+    justifyContent: 'space-between',
   },
   storeIcon: {
     flex: 0.15,
@@ -262,11 +268,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+
+    width: isWide ? "48%" : "100%"
   },
   addCard: {
     backgroundColor: Palette.gray,
-    borderWidth: 1,
-    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
   },
