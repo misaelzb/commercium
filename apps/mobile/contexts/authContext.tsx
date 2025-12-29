@@ -11,7 +11,6 @@ import { storeDataApiParse } from "@/util";
 interface AuthContextType {
   currentUser: (User.InfoType & { stores: Store.StoreType[] }) | null;
   isLoading: boolean;
-  authHeader: { Authorization: string };
   signUp: (data: User.CreateData) => Promise<ApiResponse>; // does not return user! must sign in after register
   signIn: (data: User.LoginData) => Promise<ApiResponse>;
   signOut: () => Promise<void>;
@@ -34,26 +33,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const token = await getSessionToken();
       if (token) {
-        // if there's a session token stored
-        const authHeader = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        };
-        let cuResponse = await client.api.users.me.$get(
-          {},
-          {
-            headers: authHeader,
-          }
-        );
+        let cuResponse = await client.api.users.me.$get();
         let json = await cuResponse.json();
         if (!json.error) {
           // user session is NOT expired
-          let storesResponse = await client.api.stores.list.$get(
-            {},
-            {
-              headers: authHeader,
-            }
-          );
+          let storesResponse = await client.api.stores.list.$get();
           let sJson = await storesResponse.json();
           if (json.error) {
             throw new Error(sJson.error);
@@ -79,9 +63,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     loadInitialData();
   }, []);
-  const authHeader = {
-    Authorization: `Bearer ${authToken}`,
-  };
   const signUp = async ({
     username,
     password,
@@ -96,15 +77,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           firstName,
           lastName,
         },
-      },
-      { headers: authHeader }
-    );
+      });
     let json = await response.json();
     return json as ApiResponse;
   };
 
   const fetchStores = async (): Promise<Store.StoreType[]> => {
-    let response = await client.api.stores.list.$get({}, { headers: authHeader });
+    let response = await client.api.stores.list.$get();
     let json = await response.json();
     if (json.error) throw new Error(json.error);
     setStores(json.data!.map(storeDataApiParse));
@@ -118,9 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           username,
           password,
         },
-      },
-      { headers: authHeader }
-    );
+      });
     let json = await response.json();
     if (!json.error) {
       setAuthToken(json.data);
@@ -131,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    await client.api.auth.logout.$get({}, { headers: authHeader });
+    await client.api.auth.logout.$get();
     await deleteSessionToken();
     setAuthToken(null);
     setUser(null);
@@ -150,7 +127,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         signUp,
         signIn,
         signOut,
-        authHeader,
         revalidateUser,
         fetchStores
       }}

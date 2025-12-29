@@ -23,7 +23,7 @@ const windowWidth = Dimensions.get('window').width;
 const isWide = windowWidth >= 600;
 
 export default function HomeTab() {
-  const { currentUser, authHeader, fetchStores } = useAuth();
+  const { currentUser, fetchStores } = useAuth();
   const [localStores, setLocalStores] = useState<Store.StoreType[]>(
     currentUser?.stores || []
   );
@@ -56,11 +56,7 @@ export default function HomeTab() {
           description:
             storeDescription.trim().length > 0 ? storeDescription : null,
         },
-      },
-      {
-        headers: authHeader,
-      }
-    );
+      });
     let d = await response.json();
     console.log(d);
     if (d.error) setError(d.error);
@@ -78,11 +74,7 @@ export default function HomeTab() {
     let response = await client.api.stores[":storeId"].$delete(
       {
         param: { storeId: storePressedId.toString() },
-      },
-      {
-        headers: authHeader,
-      }
-    );
+      });
     let d = await response.json();
     if (d.error) setError(d.error);
     else {

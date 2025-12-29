@@ -38,7 +38,6 @@ export default function StoreHome() {
     isActionLoading,
     deleteProduct,
     products,
-    editProduct,
     fetchAnalytics,
     sales,
     salesAnalytics,
@@ -59,14 +58,6 @@ export default function StoreHome() {
       name: "Configuration",
     },
   ];
-
-  const handleEditProduct = async (
-    sku: string,
-    data: Products.ProductCreateType
-  ) => {
-    let success = await editProduct(sku, data);
-    if (success) setProductSelected(null);
-  };
 
   const handleDeleteProduct = async (sku: string) => {
     await deleteProduct(sku);
@@ -169,7 +160,6 @@ export default function StoreHome() {
               <ProductsTab
                 products={products}
                 selectedProductState={[productSelected, setProductSelected]}
-                onEdit={handleEditProduct}
               />
             )}
             {

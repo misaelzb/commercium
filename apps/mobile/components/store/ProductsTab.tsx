@@ -20,7 +20,6 @@ export const ProductsTab = ({
     Products.ProductType | null,
     (value: Products.ProductType | null) => void
   ];
-  onEdit: (sku: string, data: Products.ProductCreateType) => any;
 }) => {
   const params = useLocalSearchParams();
   const storeId = params.storeId.toString();

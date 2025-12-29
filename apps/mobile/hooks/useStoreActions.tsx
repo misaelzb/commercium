@@ -1,6 +1,6 @@
-import { useAuth } from "@/contexts";
 import { client } from "@/services";
-import { Products, Sales, Store } from "@commercium/core";
+import { ApiResponse, Products, Sales, Store } from "@commercium/core";
+import { ClientResponse } from "hono/client";
 import { useState, useCallback } from "react";
 import Toast from "react-native-toast-message";
 
@@ -27,14 +27,12 @@ const parseAnalytics = (data: any): Sales.AnalyticsReport => {
 };
 
 export const useStoreActions = (storeId: string) => {
-  const { authHeader } = useAuth();
   const [products, setProducts] = useState<Products.ProductType[]>([]);
   const [store, setStore] = useState<Store.StoreType>();
   const [sales, setSales] = useState<Sales.SaleInfo[]>([]);
   const [isActionLoading, setActionLoading] = useState(false);
   const [salesAnalytics, setSalesAnalytics] = useState<Sales.AnalyticsReport>();
 
-  const headers = { headers: authHeader };
   const fetchData = useCallback(
     async (
       options: {
@@ -49,21 +47,19 @@ export const useStoreActions = (storeId: string) => {
 
         if (options.store)
           promises.push(
-            client.api.stores[":storeId"].$get({ param: { storeId } }, headers)
+            client.api.stores[":storeId"].$get({ param: { storeId } })
           );
-        if (options.products) 
+        if (options.products)
           promises.push(
-            client.api.stores[":storeId"].products.s.list.$get(
-              { param: { storeId } },
-              headers
-            )
+            client.api.stores[":storeId"].products.s.list.$get({
+              param: { storeId },
+            })
           );
         if (options.sales)
           promises.push(
-            client.api.stores[":storeId"].sales.list.$get(
-              { param: { storeId } },
-              headers
-            )
+            client.api.stores[":storeId"].sales.list.$get({
+              param: { storeId },
+            })
           );
 
         const responses = await Promise.all(promises);
@@ -91,18 +87,15 @@ export const useStoreActions = (storeId: string) => {
         setActionLoading(false);
       }
     },
-    [storeId, authHeader]
+    [storeId]
   );
 
   const deleteProduct = async (sku: string) => {
     setActionLoading(true);
     try {
-      const res = await client.api.stores[":storeId"].products[":sku"].$delete(
-        {
-          param: { storeId, sku },
-        },
-        { headers: authHeader }
-      );
+      const res = await client.api.stores[":storeId"].products[":sku"].$delete({
+        param: { storeId, sku },
+      });
 
       if (res.ok) {
         setProducts((prev) => prev.filter((p) => p.sku !== sku));
@@ -121,18 +114,15 @@ export const useStoreActions = (storeId: string) => {
   const deleteStore = async () => {
     setActionLoading(true);
     try {
-      const res = await client.api.stores[":storeId"].$delete(
-        {
-          param: { storeId },
-        },
-        { headers: authHeader }
-      );
+      const res = await client.api.stores[":storeId"].$delete({
+        param: { storeId },
+      });
 
       if (res.ok) {
         Toast.show({
           text1: "Store deleted successfully",
-          type: "success"
-        })
+          type: "success",
+        });
       }
     } catch (err) {
       console.error(err);
@@ -148,10 +138,9 @@ export const useStoreActions = (storeId: string) => {
   const fetchAnalytics = async () => {
     setActionLoading(true);
     try {
-      const res = await client.api.stores[":storeId"].sales.analytics.$get(
-        { param: { storeId } },
-        { headers: authHeader }
-      );
+      const res = await client.api.stores[":storeId"].sales.analytics.$get({
+        param: { storeId },
+      });
 
       const json = await res.json();
       if (json.error) throw json.error;
@@ -172,19 +161,12 @@ export const useStoreActions = (storeId: string) => {
   ): Promise<Products.ProductType | null> => {
     try {
       setActionLoading(true);
-      const res = await client.api.stores[":storeId"].products[":sku"].$get(
-        {
-          param: {
-            storeId: storeId,
-            sku: sku,
-          },
+      const res = await client.api.stores[":storeId"].products[":sku"].$get({
+        param: {
+          storeId: storeId,
+          sku: sku,
         },
-        {
-          headers: {
-            ...authHeader,
-          },
-        }
-      );
+      });
       if (res.ok) {
         const json = await res.json();
         setActionLoading(false);
@@ -203,20 +185,28 @@ export const useStoreActions = (storeId: string) => {
     return null;
   };
 
+  const editProduct = async (
+    sku: string,
+    data: Products.ProductCreateType
+  ) => {
+    // for individual error handling if required
+    let response = await client.api.stores[":storeId"].products[":sku"].$put({
+      json: { ...data },
+      param: {
+        storeId: storeId,
+        sku: sku, // will exist because it's in an 'edit' context
+      },
+    });
+    return response
+  };
+
   const registerSale = async (data: Sales.SaleCreateType): Promise<boolean> => {
     try {
       setActionLoading(true);
-      const res = await client.api.stores[":storeId"].sales.create.$post(
-        {
-          json: data,
-          param: { storeId },
-        },
-        {
-          headers: {
-            ...authHeader,
-          },
-        }
-      );
+      const res = await client.api.stores[":storeId"].sales.create.$post({
+        json: data,
+        param: { storeId },
+      });
       console.log(res);
       if (res.ok) {
         await fetchData({ sales: true });
@@ -248,13 +238,10 @@ export const useStoreActions = (storeId: string) => {
   const editStore = async (data: Store.StoreCreateType) => {
     setActionLoading(true);
     try {
-      const res = await client.api.stores[":storeId"].$put(
-        {
-          json: data,
-          param: { storeId },
-        },
-        { headers: authHeader }
-      );
+      const res = await client.api.stores[":storeId"].$put({
+        json: data,
+        param: { storeId },
+      });
       if (res.ok) {
         if (store) setStore((prev) => ({ ...prev!, ...data }));
         Toast.show({
@@ -283,12 +270,9 @@ export const useStoreActions = (storeId: string) => {
   const deleteSale = async (id: number) => {
     setActionLoading(true);
     try {
-      const res = await client.api.stores[":storeId"].sales[":saleId"].$delete(
-        {
-          param: { storeId, saleId: id.toString() },
-        },
-        { headers: authHeader }
-      );
+      const res = await client.api.stores[":storeId"].sales[":saleId"].$delete({
+        param: { storeId, saleId: id.toString() },
+      });
       if (res.ok) {
         setSales((prev) => prev.filter((s) => s.id !== id));
         await fetchAnalytics();
@@ -308,11 +292,11 @@ export const useStoreActions = (storeId: string) => {
     }
   };
 
-
   return {
     products,
     store,
     fetchProduct,
+    editProduct,
     fetchAnalytics,
     salesAnalytics,
     editStore,
@@ -322,6 +306,6 @@ export const useStoreActions = (storeId: string) => {
     registerSale,
     isActionLoading,
     deleteStore,
-    deleteSale
+    deleteSale,
   };
 };

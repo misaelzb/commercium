@@ -19,6 +19,7 @@ import { CoIncrementInput } from "../CoIncrementInput";
 import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Dimensions } from "react-native";
+import { useStoreActions } from "@/hooks/useStoreActions";
 
 interface CoProductFormProps {
   type: "create" | "edit";
@@ -34,8 +35,8 @@ export const CoProductForm = ({
   initialProduct,
   afterEdit,
 }: CoProductFormProps) => {
-  const { authHeader } = useAuth();
   const params = useLocalSearchParams();
+  const { editProduct } = useStoreActions(params.storeId.toString());
   const [data, setData] = useState<ProductInputData>(
     initialProduct ??
       ({
@@ -84,31 +85,20 @@ export const CoProductForm = ({
         {
           json: { ...productFormApiParse(data) },
           param: { storeId: params.storeId.toString() },
-        },
-        { headers: authHeader }
-      );
+        });
     } else {
       // 'edit'
-      response = await client.api.stores[":storeId"].products[":sku"].$put(
-        {
-          json: { ...productFormApiParse(data) },
-          param: {
-            storeId: params.storeId.toString(),
-            sku: initialProduct!.sku, // will exist because it's in an 'edit' context
-          },
-        },
-        { headers: authHeader }
-      );
+      response = await editProduct(initialProduct!.sku, { ...productFormApiParse(data) });
     }
 
     let json = await response.json();
 
     if (json.error) {
       let newErrors = json.zodIssues
-        ?.map((x: { path: any[]; message: any }) => {
+        ?.map((x: { path: any[]; message: string }) => {
           return { [x.path[0]!.toString()]: x.message };
         })
-        .reduce((prev: any, curr: any) => ({ ...prev, ...curr }), {}) || {
+        .reduce((prev, curr) => ({ ...prev, ...curr }), {}) || {
         ...errors,
         global: json.error || "Something went wrong. Please try again later.",
       };

@@ -22,8 +22,8 @@ export namespace Products {
         .default(() => generateSKU())
     ),
     description: z.string().min(3).max(255),
-    costPrice: z.number(),
-    salePrice: z.number(),
+    costPrice: z.number().min(0),
+    salePrice: z.number().min(0),
     storeId: z.number(),
     stock: z.number().default(0),
     createdAt: dateValue(),
