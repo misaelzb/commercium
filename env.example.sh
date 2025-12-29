@@ -1,0 +1,7 @@
+export AWS_SECRET_ACCESS_KEY=""
+export AWS_ACCESS_KEY_ID=""
+export CLOUDFLARE_API_TOKEN=""
+export CLOUDFLARE_DEFAULT_ACCOUNT_ID=""
+export STAGE=""
+export DATABASE_URL=""
+export GEMINI_API_KEY=""

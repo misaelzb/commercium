@@ -121,7 +121,8 @@ export default function AuthScreen() {
         }
       } catch (error) {
         Toast.show({
-          text1: "All fields are required",
+          text1: `Something went wrong. Try again later`,
+          text2: `${error}`,
           type: "error",
         });
       } finally {

@@ -138,7 +138,7 @@ export namespace Sales {
       .leftJoin(saleDetailsTable, eq(salesTable.id, saleDetailsTable.saleId))
       .leftJoin(productsTable, eq(saleDetailsTable.productId, productsTable.id))
       .orderBy(desc(salesTable.createdAt))
-      .limit(10);
+      .limit(20);
 
     const finalSales: SaleInfo[] = [];
 

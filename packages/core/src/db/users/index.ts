@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Drizzle } from "../../shared/drizzle";
 import { userTable, type UserTableType } from "./users.sql";
 import { eq, or } from "drizzle-orm";
-import { password } from "bun";
+import bcrypt from "bcryptjs";
 import { Session } from "../sessions";
 import type { DBQueryResponse } from "..";
 
@@ -100,7 +100,8 @@ export namespace User {
     if (existingUser)
       return { success: false, errorDetail: "Username is already taken" };
 
-    const hashedPassword = password.hashSync(data.password, "bcrypt");
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(data.password, salt);
 
     await Drizzle.db.insert(userTable).values({
       ...data,
@@ -116,7 +117,7 @@ export namespace User {
     const user = (await fetch(data.username, {
       sensitive: true,
     })) as UserTableType | null;
-    if (!user || !password.verifySync(data.password, user.hashedPassword))
+    if (!user || !bcrypt.compareSync(data.password, user.hashedPassword))
       return { success: false, errorDetail: "Invalid credentials" };
 
     let sessionToken = await Session.create(user.id);

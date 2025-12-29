@@ -6,10 +6,15 @@
     "apps/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/aws-lambda": "8.10.159",
+    "@types/bun": "latest",
+    "pulumi": "^0.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "sst": "3.17.25"
+  }
 }

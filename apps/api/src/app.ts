@@ -8,11 +8,14 @@ import { storeRoutes } from "./routes/store";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-
 const app = new Hono();
 
 const routes = app
-  .use(cors())
+  // .use(
+  //   cors({
+  //     origin: "*",
+  //   })
+  // )
   .use(logger())
   .route("/api/auth", authRoutes)
   .route("/api/users", userRoutes)
@@ -38,6 +41,10 @@ const routes = app
           description: "Commercium API",
         },
         servers: [
+          {
+            url: "https://me424ikcg7cwcmzdrd4pflmuye0lofuo.lambda-url.us-east-1.on.aws/",
+            description: "Staging server",
+          },
           { url: "http://localhost:3001", description: "Local Server" },
         ],
       },
