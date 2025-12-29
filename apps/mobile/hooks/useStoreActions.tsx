@@ -145,38 +145,6 @@ export const useStoreActions = (storeId: string) => {
     }
   };
 
-
-  const editProduct = async (sku: string, data: Products.ProductCreateType) => {
-    setActionLoading(true);
-    try {
-      const res = await client.api.stores[":storeId"].products[":sku"].$put(
-        {
-          json: data,
-          param: { storeId, sku },
-        },
-        { headers: authHeader }
-      );
-
-      if (res.ok) {
-        setProducts((prev) =>
-          prev.map((p) => (p.sku === sku ? { ...p, ...data } : p))
-        );
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error(err);
-      Toast.show({
-        text1: "Failed to edit product",
-        text2: `${err}`,
-        type: "error",
-      });
-      return false;
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const fetchAnalytics = async () => {
     setActionLoading(true);
     try {
@@ -351,7 +319,6 @@ export const useStoreActions = (storeId: string) => {
     sales,
     fetchData,
     deleteProduct,
-    editProduct,
     registerSale,
     isActionLoading,
     deleteStore,

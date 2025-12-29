@@ -18,38 +18,43 @@ import { Products } from "@commercium/core";
 import { CoIncrementInput } from "../CoIncrementInput";
 import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
 
 interface CoProductFormProps {
   type: "create" | "edit";
-  initialProduct?: Products.ProductType;
+  initialProduct?: ProductInputData;
+  afterEdit?: (data: ProductInputData) => void;
 }
 
-const windowWidth = Dimensions.get('window').width;
+const windowWidth = Dimensions.get("window").width;
 const isWide = windowWidth >= 600;
 
-export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
+export const CoProductForm = ({
+  type,
+  initialProduct,
+  afterEdit,
+}: CoProductFormProps) => {
   const { authHeader } = useAuth();
   const params = useLocalSearchParams();
   const [data, setData] = useState<ProductInputData>(
-    initialProduct
-      ? productDataAsForm(initialProduct)
-      : ({
-          sku: "",
-          description: "",
-          costPrice: "",
-          salePrice: "",
-          stock: 1,
-        } as ProductInputData)
+    initialProduct ??
+      ({
+        sku: "",
+        description: "",
+        costPrice: "",
+        salePrice: "",
+        stock: 1,
+      } as ProductInputData)
   );
-  const [errors, setErrors] = useState<Record<string, string>>({
+  const initalErrorData = {
     global: "",
     sku: "",
     description: "",
     costPrice: "",
     salePrice: "",
     stock: "",
-  });
+  };
+  const [errors, setErrors] = useState<Record<string, string>>(initalErrorData);
 
   const [isLoading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -59,15 +64,20 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
   };
 
   const handleSubmit = async () => {
-		setSuccessMsg("");
+    setSuccessMsg("");
+
     let { sku, ...requiredFields } = data;
 
-    if (Object.values(requiredFields).some((x) => !x && x !== 0)) {
+    if (
+      Object.values(type == "edit" ? data : requiredFields).some(
+        (x) => !x && x !== 0
+      )
+    ) {
       setErrors({ ...errors, global: "Make sure all fields are filled" });
       return;
     }
     setLoading(true);
-    setErrors({ ...errors, global: "" });
+    setErrors(initalErrorData);
     let response = null;
     if (type == "create") {
       response = await client.api.stores[":storeId"].products.create.$post(
@@ -84,7 +94,7 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
           json: { ...productFormApiParse(data) },
           param: {
             storeId: params.storeId.toString(),
-            sku: params.sku.toString(),
+            sku: initialProduct!.sku, // will exist because it's in an 'edit' context
           },
         },
         { headers: authHeader }
@@ -110,6 +120,12 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
     if (type == "create") {
       router.back();
     } else {
+      let updated = {
+        ...data, 
+        sku: data.sku.toUpperCase()
+      };
+      afterEdit!(updated);
+      setData(updated);
       setSuccessMsg("Product updated successfully!");
       setLoading(false);
     }
@@ -127,17 +143,11 @@ export const CoProductForm = ({ type, initialProduct }: CoProductFormProps) => {
               : { backgroundColor: Palette.success },
           ]}
         >
-					<Ionicons
-						name="information-circle"
-						color={"#fff"}
-						size={17}
-						/>
+          <Ionicons name="information-circle" color={"#fff"} size={17} />
           {errors.global && (
             <CoText style={styles.msgText}>{errors.global}</CoText>
           )}
-          {successMsg && (
-            <CoText style={styles.msgText}>{successMsg}</CoText>
-          )}
+          {successMsg && <CoText style={styles.msgText}>{successMsg}</CoText>}
         </View>
       )}
       <CoSeparator />
@@ -212,17 +222,17 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   msgContainer: {
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 10,
-		borderRadius: 10,
-		gap: 10
+    borderRadius: 10,
+    gap: 10,
   },
-	msgText: {
-		color: "#fff",
-		textAlign: "center",
-		fontWeight: "bold",
-		fontSize: 17
-	}
+  msgText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 17,
+  },
 });
