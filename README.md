@@ -29,6 +29,7 @@ bunx expo start
 3) Ejecutar el backend
 
 ```bash
+source env.sh # cargar variables de entorno
 cd apps/api
 bun install
 bun run dev
