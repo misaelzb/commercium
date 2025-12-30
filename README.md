@@ -34,17 +34,3 @@ cd apps/api
 bun install
 bun run dev
 ```
-
-**Comandos útiles (bun)**
-
-- Iniciar mobile (desde raíz):
-
-```bash
-cd apps/mobile && bunx expo start
-```
-
-- Iniciar backend:
-
-```bash
-cd apps/api && bun run dev
-```
