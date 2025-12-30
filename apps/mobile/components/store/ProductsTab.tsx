@@ -6,10 +6,10 @@ import { FlatList, View } from "react-native";
 import { CoCard } from "../CoCard";
 import { CoText } from "../CoText";
 import CoInput from "../CoInput";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dimensions } from "react-native";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+import { getLayoutInfo } from "@/util";
+const { isWide } = getLayoutInfo()
 
 export const ProductsTab = ({
   products,

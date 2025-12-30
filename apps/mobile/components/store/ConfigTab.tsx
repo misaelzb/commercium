@@ -7,8 +7,8 @@ import CoButton from "../CoButton";
 import { CoSeparator } from "../CoSeparator";
 import { CoModal } from "../CoModal";
 import { Dimensions } from "react-native";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+import { getLayoutInfo } from "@/util";
+const { isWide } = getLayoutInfo()
 
 export default function ConfigTab({
   store,

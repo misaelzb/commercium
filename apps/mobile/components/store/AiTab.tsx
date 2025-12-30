@@ -11,8 +11,8 @@ import { Palette } from "@/styles/pallete";
 import Toast from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect } from "react";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+import { getLayoutInfo } from "@/util";
+const { isWide } = getLayoutInfo()
 
 export default function AiTab({
   aiData,

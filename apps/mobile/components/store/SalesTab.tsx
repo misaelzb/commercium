@@ -9,9 +9,8 @@ import { useState } from "react";
 import Toast from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CoModal } from "../CoModal";
-import { Dimensions } from "react-native";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+import { getLayoutInfo } from "@/util";
+const { isWide } = getLayoutInfo()
 
 export default function SalesTab({
   sales,
