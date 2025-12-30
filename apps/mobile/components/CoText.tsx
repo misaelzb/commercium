@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextProps, TextStyle, ColorValue } from "react-native";
+import { StyleSheet, Text, TextProps, ColorValue } from "react-native";
 
 export interface CoTextProps extends TextProps {
   white?: boolean;

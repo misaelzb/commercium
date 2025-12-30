@@ -38,7 +38,7 @@ export default function SalesTab({
 
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: "#f8f9fa" }}>
+      <View style={styles.mainContainer}>
         <View style={{ gap: 10 }}>
           <View style={styles.row}>
             <CoCard style={{ flex: 1, marginRight: 10 }}>
@@ -91,6 +91,7 @@ export default function SalesTab({
             flexDirection: "row",
             flexWrap: "wrap",
             justifyContent: "space-between",
+            paddingBottom: 40,
           }}
         >
           {sales.length === 0 && (
@@ -214,12 +215,16 @@ export default function SalesTab({
                   marginTop: 20,
                   borderBottomWidth: 0,
                   justifyContent: "space-between",
-                  backgroundColor: Palette.backgroundSecondary
+                  backgroundColor: Palette.backgroundSecondary,
                 },
               ]}
             >
-              <CoText white style={styles.detailHeader}>Total</CoText>
-              <CoText white style={styles.detailHeader}>${selectedSale.total}</CoText>
+              <CoText white style={styles.detailHeader}>
+                Total
+              </CoText>
+              <CoText white style={styles.detailHeader}>
+                ${selectedSale.total}
+              </CoText>
             </View>
           </View>
         </CoModal>
@@ -232,7 +237,12 @@ const styles = StyleSheet.create({
   statsContainer: {
     padding: 20,
   },
-
+  mainContainer: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+    width: isWide ? "50%" : "100%",
+    alignSelf: "center",
+  },
   cardValue: { fontSize: 32, fontWeight: "bold", color: "#212529" },
   badge: {
     paddingHorizontal: 4,

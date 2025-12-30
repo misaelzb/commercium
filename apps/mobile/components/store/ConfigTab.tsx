@@ -58,11 +58,13 @@ export default function ConfigTab({
               label="Name"
               value={data.name}
               onChangeText={(v) => setData({ ...data, name: v })}
+              maxLength={35}
             />
             <CoInput
               label="Description"
               value={data.description || ""}
               onChangeText={(v) => setData({ ...data, description: v })}
+              maxLength={100} 
             />
           </View>
           <View>
@@ -97,7 +99,6 @@ const styles = StyleSheet.create({
   footer: {
     flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 60,
     width: isWide ? "50%" : "100%",
     marginTop: isWide ? 20: 0,
     alignSelf: "center",

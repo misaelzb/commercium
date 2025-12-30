@@ -5,9 +5,9 @@ import { Products } from "@commercium/core";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import CoButton from "../CoButton";
-import { Dimensions } from "react-native";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+import { getLayoutInfo } from "@/util";
+
+const { isWide } = getLayoutInfo();
 
 type CoProductCardProps = {
   data: Products.ProductType;

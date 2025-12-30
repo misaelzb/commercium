@@ -2,7 +2,6 @@ import { CoLoadingContainer, CoProductForm, CoSafeContainer } from "@/components
 import { useStoreActions } from "@/hooks/useStoreActions";
 import { Palette } from "@/styles/pallete";
 import { productDataAsForm, ProductInputData } from "@/util";
-import { Products } from "@commercium/core";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 

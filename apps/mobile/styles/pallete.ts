@@ -9,6 +9,7 @@ export const Palette = {
   success: "#73AF6F",
   danger: "#f05959ff",
   primary: "#007E6E",
+  warning: "#d88d46",
 
   textPrimary: "#333333",
   textWhite: "#FFFFFF",

@@ -1,7 +1,6 @@
 
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ViewProps } from "react-native";
-import { CoInput } from "./CoInput";
+import React from "react";
+import { View, TouchableOpacity, StyleSheet, TextInput, ViewProps } from "react-native";
 import { CoText } from "./CoText";
 
 export const CoIncrementInput = ({

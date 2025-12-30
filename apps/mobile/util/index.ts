@@ -1,4 +1,5 @@
 import { Products, Store } from "@commercium/core";
+import { Dimensions } from "react-native";
 
 export type ProductInputData = Omit<
   Products.ProductType,
@@ -37,3 +38,12 @@ export const storeDataApiParse = (
     updatedAt: new Date(data.updatedAt),
   };
 }
+
+export const getLayoutInfo = () => {
+  const width = Dimensions.get("window").width;
+
+  return {
+    width,
+    isWide: width >= 600,
+  };
+};

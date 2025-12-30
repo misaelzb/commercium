@@ -6,19 +6,16 @@ import { useState } from "react";
 import { CoText } from "../CoText";
 import { Palette } from "@/styles/pallete";
 import CoButton from "../CoButton";
-import { useAuth } from "@/contexts";
 import { router, useLocalSearchParams } from "expo-router";
 import { client } from "@/services";
 import {
-  productDataAsForm,
+  getLayoutInfo,
   productFormApiParse,
   ProductInputData,
 } from "@/util";
-import { Products } from "@commercium/core";
 import { CoIncrementInput } from "../CoIncrementInput";
 import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Dimensions } from "react-native";
 import { useStoreActions } from "@/hooks/useStoreActions";
 
 interface CoProductFormProps {
@@ -27,8 +24,7 @@ interface CoProductFormProps {
   afterEdit?: (data: ProductInputData) => void;
 }
 
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+const { isWide } = getLayoutInfo();
 
 export const CoProductForm = ({
   type,
@@ -142,7 +138,7 @@ export const CoProductForm = ({
       )}
       <CoSeparator />
       <CoInput
-        label="SKU (optional)"
+        label={"SKU" + (type == "create" ? " (optional)" : "")}
         placeholder="e.g. ABC-1234567-ZY"
         onChangeText={(value) => updateInput("sku", value)}
         value={data.sku}
@@ -154,6 +150,7 @@ export const CoProductForm = ({
         onChangeText={(value) => updateInput("description", value)}
         value={data.description}
         error={errors.description}
+        maxLength={120}
       />
       <View
         style={{

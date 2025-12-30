@@ -1,11 +1,17 @@
 import { ImageSourcePropType, StyleSheet, View } from "react-native";
-import { CoCard, CoCardTitle } from "./CoCard";
-import { CoText } from "./CoText";
+import { CoCard } from "./CoCard";
 import { Image } from "react-native";
 import { Palette } from "@/styles/pallete";
+import { getLayoutInfo } from "@/util";
+
+const { isWide } = getLayoutInfo();
 
 export function CoHero({ children }: { children: React.ReactNode }) {
-  return <CoCard style={[styles.heroCard]}>{children}</CoCard>;
+  return (
+    <CoCard style={[styles.heroCard]}>
+      <View style={styles.heroContent}>{children}</View>
+    </CoCard>
+  );
 }
 
 export function CoHeroText({ children }: { children: React.ReactNode }) {
@@ -20,9 +26,7 @@ const styles = StyleSheet.create({
   heroCard: {
     backgroundColor: Palette.backgroundPrimary,
     borderRadius: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    
     paddingTop: 100,
     padding: 24,
     borderBottomEndRadius: 0,
@@ -31,6 +35,12 @@ const styles = StyleSheet.create({
   heroTextContainer: {
     flex: 1,
     paddingRight: 15,
+  },
+  heroContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: isWide ? "25%" : 0,
   },
   heroImage: {
     width: 65,

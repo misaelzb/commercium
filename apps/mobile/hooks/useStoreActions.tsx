@@ -1,6 +1,5 @@
 import { client } from "@/services";
-import { ApiResponse, Products, Sales, Store } from "@commercium/core";
-import { ClientResponse } from "hono/client";
+import { ApiResponse, Products, Sales, Store, Ai } from "@commercium/core";
 import { useState, useCallback } from "react";
 import Toast from "react-native-toast-message";
 
@@ -25,6 +24,20 @@ const parseAnalytics = (data: any): Sales.AnalyticsReport => {
     topProducts: data.topProducts.map(parseProduct),
   };
 };
+
+const showError = (text1: string, text2?: string) => {
+  Toast.show({
+    text1,
+    text2,
+  });
+}
+const showSuccess = (text1: string, text2?: string) => {
+  Toast.show({
+    text1,
+    text2,
+    type: "success",
+  });
+}
 
 export const useStoreActions = (storeId: string) => {
   const [products, setProducts] = useState<Products.ProductType[]>([]);
@@ -79,10 +92,7 @@ export const useStoreActions = (storeId: string) => {
         }
       } catch (err) {
         console.error(err);
-        Toast.show({
-          text1: "Failed to load data",
-          type: "error",
-        });
+        showError("Failed to load data");
       } finally {
         setActionLoading(false);
       }
@@ -102,10 +112,7 @@ export const useStoreActions = (storeId: string) => {
       }
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to delete product",
-        type: "error",
-      });
+      showError("Failed to delete product")
     } finally {
       setActionLoading(false);
     }
@@ -118,18 +125,11 @@ export const useStoreActions = (storeId: string) => {
         param: { storeId },
       });
 
-      if (res.ok) {
-        Toast.show({
-          text1: "Store deleted successfully",
-          type: "success",
-        });
-      }
+      if (res.ok) showSuccess("Store deleted successfully");
+      else showError("Failed to delete store")
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to delete store",
-        type: "error",
-      });
+      showError("Failed to delete store")
     } finally {
       setActionLoading(false);
     }
@@ -147,10 +147,7 @@ export const useStoreActions = (storeId: string) => {
       setSalesAnalytics(parseAnalytics(json.data));
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to load analytics",
-        type: "error",
-      });
+      showError("Failed to fetch analytics");
     } finally {
       setActionLoading(false);
     }
@@ -173,11 +170,7 @@ export const useStoreActions = (storeId: string) => {
         return parseProduct(json.data);
       }
     } catch (err) {
-      Toast.show({
-        text1: "Error while fetching product",
-        text2: `${err}`,
-        type: "error",
-      });
+      showError("Failed to fetch product", `${err}`);
       console.error(err);
     } finally {
       setActionLoading(false);
@@ -207,28 +200,17 @@ export const useStoreActions = (storeId: string) => {
         json: data,
         param: { storeId },
       });
-      console.log(res);
       if (res.ok) {
         await fetchData({ sales: true });
         await fetchAnalytics();
         return true;
       } else {
         const json = await res.json();
-        if (json.error) {
-          Toast.show({
-            text1: "Failed to register sale",
-            text2: `${json.error}`,
-            type: "error",
-          });
-        }
+        if (json.error) showError("Failed to register sale", `${json.error}`);
       }
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to register sale",
-        text2: `${err}`,
-        type: "error",
-      });
+      showError("Failed to register sale", `${err}`);
     } finally {
       setActionLoading(false);
     }
@@ -244,24 +226,14 @@ export const useStoreActions = (storeId: string) => {
       });
       if (res.ok) {
         if (store) setStore((prev) => ({ ...prev!, ...data }));
-        Toast.show({
-          text1: "Store updated successfully",
-          type: "success",
-        });
+        showSuccess("Store updated successfully");
       } else {
         let json = await res.json().catch(() => ({ error: "Unknown error" }));
-        Toast.show({
-          text1: "Failed to edit store",
-          text2: `${json.error}`,
-          type: "error",
-        });
+        showError("Failed to edit store", `${json.error}`);
       }
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to edit store",
-        type: "error",
-      });
+      showError("Failed to edit store", `${err}`);
     } finally {
       setActionLoading(false);
     }
@@ -276,21 +248,36 @@ export const useStoreActions = (storeId: string) => {
       if (res.ok) {
         setSales((prev) => prev.filter((s) => s.id !== id));
         await fetchAnalytics();
-        Toast.show({
-          text1: "Sale deleted successfully",
-          type: "success",
-        });
+        showSuccess("Sale deleted successfully");
       }
     } catch (err) {
       console.error(err);
-      Toast.show({
-        text1: "Failed to delete sale",
-        type: "error",
-      });
+      showError("Failed to delete sale", `${err}`);
     } finally {
       setActionLoading(false);
     }
   };
+
+  const fetchAiSuggestions = async (type: "generate" | "get"): Promise<Ai.AiGeneratedData | null> => { // for the store
+    try {
+
+      setActionLoading(true);
+      const res = await client.api.stores[":storeId"].ai.suggestions[type].$get({
+        param: { storeId },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data) return json.data;
+      }
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      setActionLoading(false);
+    }
+    return null;
+  }
+
 
   return {
     products,
@@ -305,6 +292,7 @@ export const useStoreActions = (storeId: string) => {
     deleteProduct,
     registerSale,
     isActionLoading,
+    fetchAiSuggestions,
     deleteStore,
     deleteSale,
   };

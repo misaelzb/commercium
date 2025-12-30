@@ -6,12 +6,16 @@ import {
   CoText,
 } from "@/components";
 import { useStoreActions } from "@/hooks/useStoreActions";
+import { getLayoutInfo } from "@/util";
 import { Sales } from "@commercium/core";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Toast from "react-native-toast-message";
+
+const { isWide } = getLayoutInfo();
+
 
 export default function RegisterSale() {
   const params = useLocalSearchParams();
@@ -290,6 +294,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
     gap: 20,
+    paddingHorizontal: isWide ? "25%" : 0
   },
   productsListContainer: {
     gap: 1,

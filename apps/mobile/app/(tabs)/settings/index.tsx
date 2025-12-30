@@ -10,6 +10,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "@/contexts";
 import { router } from "expo-router";
 import { Palette } from "@/styles/pallete";
+import { getLayoutInfo } from "@/util";
+
+const { isWide } = getLayoutInfo();
+
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -56,7 +60,7 @@ const SettingsTab = () => {
     router.replace("/auth");
   }
   return (
-    <View>
+    <>
       <CoHero>
         <CoHeroText>
           <CoText asTitle white>
@@ -73,7 +77,7 @@ const SettingsTab = () => {
         <Text style={styles.sectionTitle}>Account</Text>
         <ActionItem background={Palette.danger} iconName={"exit"} title="Log out" onPress={handleSignOut} />
       </View>
-    </View>
+    </>
   );
 };
 
@@ -83,6 +87,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     top: -19,
     padding: 20,
+    paddingHorizontal: isWide ? "25%" : 20
   },
   input: {
     height: 40,

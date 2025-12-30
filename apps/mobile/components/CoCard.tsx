@@ -1,8 +1,6 @@
-import { Palette } from "@/styles/pallete";
+
 import {
   StyleSheet,
-  Text,
-  TextProps,
   TouchableOpacity,
   View,
   ViewProps,

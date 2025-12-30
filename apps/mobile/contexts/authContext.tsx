@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User.InfoType | null>(null);
   const [stores, setStores] = useState<Store.StoreType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authToken, setAuthToken] = useState<string | null>(null);
 
   const loadInitialData = async () => {
     try {
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (json.error) {
             throw new Error(sJson.error);
           }
-          setAuthToken(token);
           console.log(sJson);
           setStores(sJson.data!.map(storeDataApiParse));
           setUser(json.data);
@@ -100,7 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     let json = await response.json();
     if (!json.error) {
-      setAuthToken(json.data);
       await saveSessionToken(json.data);
       await revalidateUser();
     }
@@ -110,7 +107,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     await client.api.auth.logout.$get();
     await deleteSessionToken();
-    setAuthToken(null);
     setUser(null);
   };
 

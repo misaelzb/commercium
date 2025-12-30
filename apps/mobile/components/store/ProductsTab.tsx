@@ -83,6 +83,8 @@ export const ProductsTab = ({
       contentContainerStyle={{
         paddingBottom: 100,
         paddingHorizontal: 2,
+        width: isWide ? "50%" : "100%",
+        alignSelf: "center"
       }}
     />
   );

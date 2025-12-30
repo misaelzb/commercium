@@ -10,13 +10,14 @@ import {
 } from "@/components";
 import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
+import { getLayoutInfo } from "@/util";
 import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Dimensions } from "react-native";
 import Toast from "react-native-toast-message";
-const windowWidth = Dimensions.get("window").width;
-const isWide = windowWidth >= 600;
+
+const { isWide } = getLayoutInfo();
+
 
 const styles = StyleSheet.create({
   container: {
@@ -41,95 +42,76 @@ const styles = StyleSheet.create({
 
 export default function AuthScreen() {
   const auth = useAuth();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [data, setData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   async function handleAuth() {
     setIsLoading(true);
-    let fields = [firstName, lastName, username, password, confirmPassword];
-    if (isRegistering) {
-      if (fields.some((field) => field === "")) {
-        Toast.show({
-          text1: "All fields are required",
-          type: "error",
-        });
-        setIsLoading(false);
-        return;
-      }
-      if (confirmPassword !== password) {
-        Toast.show({
-          text1: "Passwords don't match",
-          type: "error",
-        });
-        setIsLoading(false);
-        return;
-      }
-      try {
-        let response = await auth.signUp({
-          username,
-          password,
-          firstName,
-          lastName,
-        });
-        if (response.error)
-          Toast.show({
-            text1: response.error,
-            type: "error",
-          });
-        else {
-          await auth
-            .signIn({ username, password })
-            .then(() => router.push("/(tabs)"))
-            .catch(() =>
-              Toast.show({
-                text1: "Something went wrong. Try again later",
-                type: "error",
-              })
-            );
+
+    const cleanedData = Object.keys(data).reduce((acc, key) => {
+      const value = data[key as keyof typeof data];
+      //@ts-ignore
+      acc[key] =
+        typeof value === "string" && !["password", "confirmPassword"].includes(key)
+          ? value.trim()
+          : value;
+      return acc;
+    }, {} as typeof data);
+
+    setData(cleanedData);
+
+    try {
+      if (isRegistering) {
+        if (Object.values(cleanedData).some((field) => field === "")) {
+          return notifyError("All fields are required");
         }
-      } catch (error) {
-        Toast.show({
-          text1: `${error}`,
-          type: "error",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      try {
-        fields = [username, password];
-        if (fields.some((field) => field.trim() === "")) {
-          Toast.show({
-            text1: "All fields are required",
-            type: "error",
-          });
-					return;
+
+        if (cleanedData.confirmPassword !== cleanedData.password) {
+          return notifyError("Passwords don't match");
         }
-        let response = await auth.signIn({ username, password });
-        if (response.error)
-          Toast.show({
-            text1: response.error,
-            type: "error",
-          });
-        else {
-          router.replace("/(tabs)");
+
+        const signUpRes = await auth.signUp(cleanedData);
+        if (signUpRes.error) return notifyError(signUpRes.error);
+
+        const signInRes = await auth.signIn(cleanedData);
+        if (signInRes.error)
+          return notifyError("Account created, but login failed.");
+
+        router.replace("/(tabs)");
+      } else {
+        if (!cleanedData.username || !cleanedData.password) {
+          return notifyError("All fields are required");
         }
-      } catch (error) {
-        Toast.show({
-          text1: `Something went wrong. Try again later`,
-          text2: `${error}`,
-          type: "error",
-        });
-      } finally {
-        setIsLoading(false);
+
+        const response = await auth.signIn(cleanedData);
+        if (response.error) return notifyError(response.error);
+
+        router.replace("/(tabs)");
       }
+    } catch (error) {
+      notifyError("An unexpected error occurred", `${error}`);
+    } finally {
+      setIsLoading(false);
     }
   }
+
+  const notifyError = (text1: string, text2?: string) => {
+    Toast.show({
+      text1,
+      text2,
+      type: "error",
+    });
+    setIsLoading(false);
+    return;
+  };
 
   return (
     <CoSafeContainer style={styles.container}>
@@ -145,18 +127,20 @@ export default function AuthScreen() {
             <View>
               <CoInput
                 editable={!isLoading}
-                onChangeText={setUsername}
+                onChangeText={(text) => setData({ ...data, username: text })}
                 placeholder="Username"
-                value={username}
+                value={data.username}
+                maxLength={25}
               />
               <CoInput
+                style={{ color: "#000000" }}
                 editable={!isLoading}
                 textContentType="password"
-                onChangeText={setPassword}
+                onChangeText={(text) => setData({ ...data, password: text })}
                 secureTextEntry={true}
                 autoCapitalize="none"
                 placeholder="Password"
-                value={password}
+                value={data.password}
               />
               <CoButton
                 isLoading={isLoading}
@@ -176,15 +160,17 @@ export default function AuthScreen() {
               </Text>
               <CoInput
                 editable={!isLoading}
-                onChangeText={setFirstName}
+                onChangeText={(text) => setData({ ...data, firstName: text })}
                 placeholder="First Name"
-                value={firstName}
+                maxLength={25}
+                value={data.firstName}
               />
               <CoInput
                 editable={!isLoading}
-                onChangeText={setLastName}
+                onChangeText={(text) => setData({ ...data, lastName: text })}
                 placeholder="Last Name"
-                value={lastName}
+                value={data.lastName}
+                maxLength={25}
               />
               <View style={{ marginTop: 10 }} />
               <Text style={{ marginBottom: 5, fontWeight: "bold" }}>
@@ -192,27 +178,32 @@ export default function AuthScreen() {
               </Text>
               <CoInput
                 editable={!isLoading}
-                onChangeText={setUsername}
+                onChangeText={(text) => setData({ ...data, username: text })}
                 placeholder="Username"
-                value={username}
+                value={data.username}
+                maxLength={25}
               />
               <CoInput
                 editable={!isLoading}
+                style={{ color: "#000000" }}
                 textContentType="password"
-                onChangeText={setPassword}
+                onChangeText={(text) => setData({ ...data, password: text })}
                 placeholder="Password"
                 secureTextEntry={true}
                 autoCapitalize="none"
-                value={password}
+                value={data.password}
               />
               <CoInput
                 editable={!isLoading}
+                style={{ color: "#000000" }}
                 textContentType="password"
-                onChangeText={setConfirmPassword}
+                onChangeText={(text) =>
+                  setData({ ...data, confirmPassword: text })
+                }
                 secureTextEntry={true}
                 autoCapitalize="none"
                 placeholder="Repeat your password"
-                value={confirmPassword}
+                value={data.confirmPassword}
               />
               <CoButton
                 isLoading={isLoading}

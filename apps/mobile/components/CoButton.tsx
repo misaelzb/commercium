@@ -17,7 +17,7 @@ interface CoButtonProps extends TouchableOpacityProps {
   disabled?: boolean;
   isLoading?: boolean;
   icon?: IconName;
-  type?: "primary" | "secondary" | "danger";
+  type?: "primary" | "secondary" | "danger" | "blank";
   textStyle?: TextProps["style"];
   iconSize?: number;
 }
@@ -50,18 +50,26 @@ export const CoButton = ({
   ...props
 }: CoButtonProps) => {
   const isDisabled = disabled || isLoading;
-  const colors = {
+  const bgColors = {
     primary: Palette.backgroundPrimary,
     secondary: Palette.backgroundSecondary,
     danger: Palette.danger,
+    blank: Palette.textWhite,
   };
+  const textColors = {
+    primary: Palette.textWhite,
+    secondary: Palette.textWhite,
+    danger: Palette.textWhite,
+    blank: Palette.backgroundPrimary,
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
       style={[
         styles.button,
-        { backgroundColor: isDisabled ? "gray" : colors[type ?? "primary"] },
+        { backgroundColor: isDisabled ? "#b8b8b8ff" : bgColors[type ?? "primary"] },
         props.style
       ]}
     >
@@ -69,8 +77,8 @@ export const CoButton = ({
         <ActivityIndicator color="white" />
       ) : (
         <>
-          {icon && <Ionicons name={icon as any} size={iconSize ?? 20} color="white" />}
-          {title && <CoText style={[styles.buttonText, textStyle]}>{title.toUpperCase()}</CoText>}
+          {icon && <Ionicons name={icon as any} size={iconSize ?? 20} color={textColors[type]} />}
+          {title && <CoText style={[styles.buttonText, { color: textColors[type] },textStyle]}>{title.toUpperCase()}</CoText>}
         </>
       )}
     </TouchableOpacity>

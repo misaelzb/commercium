@@ -12,15 +12,14 @@ import { useAuth } from "@/contexts";
 import { Palette } from "@/styles/pallete";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
-import { View, StyleSheet, ScrollView} from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { client } from "@/services";
 import { router, useFocusEffect } from "expo-router";
 import { Store } from "@commercium/core";
 import { CoModal } from "@/components/CoModal";
+import { getLayoutInfo } from "@/util";
 
-import { Dimensions } from 'react-native';
-const windowWidth = Dimensions.get('window').width;
-const isWide = windowWidth >= 600;
+const { isWide } = getLayoutInfo();
 
 export default function HomeTab() {
   const { currentUser, fetchStores } = useAuth();
@@ -49,16 +48,14 @@ export default function HomeTab() {
 
   const handleCreateStore = async () => {
     setLoading(true);
-    let response = await client.api.stores.create.$post(
-      {
-        json: {
-          name: storeName,
-          description:
-            storeDescription.trim().length > 0 ? storeDescription : null,
-        },
-      });
+    let response = await client.api.stores.create.$post({
+      json: {
+        name: storeName,
+        description:
+          storeDescription.trim().length > 0 ? storeDescription : null,
+      },
+    });
     let d = await response.json();
-    console.log(d);
     if (d.error) setError(d.error);
     else {
       setLocalStores((prevState) => [...prevState, d.data]);
@@ -71,10 +68,9 @@ export default function HomeTab() {
 
   const handleDeleteStore = async () => {
     setLoading(true);
-    let response = await client.api.stores[":storeId"].$delete(
-      {
-        param: { storeId: storePressedId.toString() },
-      });
+    let response = await client.api.stores[":storeId"].$delete({
+      param: { storeId: storePressedId.toString() },
+    });
     let d = await response.json();
     if (d.error) setError(d.error);
     else {
@@ -115,11 +111,13 @@ export default function HomeTab() {
               placeholder="Your store name"
               value={storeName}
               onChangeText={setStoreName}
+              maxLength={35}
             />
             <CoInput
               placeholder="Description of your store (optional)"
               value={storeDescription}
               onChangeText={setStoreDescription}
+              maxLength={100}
             />
           </View>
           <View style={{ gap: 5 }}>
@@ -180,44 +178,48 @@ export default function HomeTab() {
             source={require("../../assets/images/white_chart.png")}
           />
         </CoHero>
-        <View style={styles.storesContainer}>
-          <CoText asTitle style={{ width: "100%" }}>My Stores</CoText>
-          {localStores.map((store, arrIndex) => (
+        <View style={styles.container}>
+          <CoText asTitle style={{ width: "100%", paddingHorizontal: isWide ? "25%" : 0, }}>
+            My Stores
+          </CoText>
+          <View style={styles.storesContainer}>
+            {localStores.map((store, arrIndex) => (
+              <CoCard
+                touchable
+                onLongPress={() => {
+                  setStorePressedId(store.id);
+                  setStorePressedName(store.name);
+                  toggleShowDeleteModal();
+                }}
+                onPress={() => {
+                  router.push(`/store/${store.id}`);
+                }}
+                key={arrIndex}
+                style={[styles.storeCard]}
+              >
+                <View style={styles.storeIcon}>
+                  <Ionicons name="storefront" color={"white"} size={30} />
+                </View>
+                <View style={styles.storeName}>
+                  <CoText numberOfLines={2} white style={styles.storeNameText}>
+                    {store.name}
+                  </CoText>
+                </View>
+                <View style={styles.storeDescription}>
+                  <CoText white numberOfLines={2}>
+                    {store.description}
+                  </CoText>
+                </View>
+              </CoCard>
+            ))}
             <CoCard
               touchable
-              onLongPress={() => {
-                setStorePressedId(store.id);
-                setStorePressedName(store.name);
-                toggleShowDeleteModal();
-              }}
-              onPress={() => {
-                router.push(`/store/${store.id}`);
-              }}
-              key={arrIndex}
-              style={[styles.storeCard]}
+              onPress={toggleShowModal}
+              style={[styles.storeCard, styles.addCard]}
             >
-              <View style={styles.storeIcon}>
-                <Ionicons name="storefront" color={"white"} size={30} />
-              </View>
-              <View style={styles.storeName}>
-                <CoText numberOfLines={2} white style={styles.storeNameText}>
-                  {store.name}
-                </CoText>
-              </View>
-              <View style={styles.storeDescription}>
-                <CoText white numberOfLines={2}>
-                  {store.description}
-                </CoText>
-              </View>
+              <Ionicons name="add" size={30} />
             </CoCard>
-          ))}
-          <CoCard
-            touchable
-            onPress={toggleShowModal}
-            style={[styles.storeCard, styles.addCard]}
-          >
-            <Ionicons name="add" size={30} />
-          </CoCard>
+          </View>
         </View>
       </ScrollView>
     </>
@@ -225,17 +227,22 @@ export default function HomeTab() {
 }
 
 const styles = StyleSheet.create({
-  storesContainer: {
+  container: {
     flex: 1,
     backgroundColor: Palette.almostWhite,
     top: -19,
     borderRadius: 20,
     padding: 20,
-    gap: 10,
+    gap: 10
+  },
 
-    flexDirection: 'row',    
-    flexWrap: 'wrap',  
-    justifyContent: 'space-between',
+  storesContainer: {
+    paddingHorizontal: isWide ? "25%" : 0,
+    alignSelf: "center",
+    gap: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   storeIcon: {
     flex: 0.15,
@@ -261,7 +268,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
 
-    width: isWide ? "48%" : "100%"
+    width: isWide ? "48%" : "100%",
   },
   addCard: {
     backgroundColor: Palette.gray,
