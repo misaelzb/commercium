@@ -44,6 +44,6 @@ export const getLayoutInfo = () => {
 
   return {
     width,
-    isWide: width >= 600,
+    isWide: width >= 1000,
   };
 };
