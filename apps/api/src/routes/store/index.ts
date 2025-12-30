@@ -2,19 +2,26 @@ import { Hono } from "hono";
 import { authMiddleware, type StoreContext } from "../../middlewares";
 import { describeRoute, resolver } from "hono-openapi";
 import { zValidator } from "@hono/zod-validator";
-import { HttpResponse, HttpStatus, Products, Store } from "@commercium/core";
+import {
+  HttpResponse,
+  HttpStatus,
+  Sales,
+  Store,
+  AiClient,
+  Ai,
+} from "@commercium/core";
 import type { StatusCode } from "hono/utils/http-status";
 import {
   AuthHeaderParameter,
   ErrorResponses,
   handleInvalidBody,
-  ProductSKUParameter,
   StoreIdParameter,
 } from "../../util";
 import z from "zod";
 import { productRoutes } from "./products";
 import { salesRoutes } from "./sales";
 import { storeCheckMiddleware } from "../../middlewares/store";
+import { RequestBodyExample } from "../../util/commonData";
 
 export const storeRoutes = new Hono<StoreContext>()
   .use("*", authMiddleware)
@@ -39,6 +46,15 @@ export const storeRoutes = new Hono<StoreContext>()
         400: ErrorResponses[400],
       },
       parameters: [AuthHeaderParameter],
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: RequestBodyExample.StoreData,
+            },
+          },
+        },
+      }
     }),
     zValidator("json", Store.StoreCreateSchema, (result, c) => {
       if (!result.success) return handleInvalidBody(result.error, c);
@@ -141,7 +157,8 @@ export const storeRoutes = new Hono<StoreContext>()
       return c.json(HttpResponse.success("OK"));
     }
   )
-  .put("/:storeId", 
+  .put(
+    "/:storeId",
     describeRoute({
       tags: ["Store"],
       description: "Update a store",
@@ -165,15 +182,13 @@ export const storeRoutes = new Hono<StoreContext>()
         content: {
           "application/json": {
             schema: {
-              example: {
-                name: "My store",
-                description: "My store description",
-              },
+              example: RequestBodyExample.StoreData,
             },
           },
         },
-      },
+      }
     }),
+    storeCheckMiddleware,
     zValidator("json", Store.StoreCreateSchema, (result, c) => {
       if (!result.success) return handleInvalidBody(result.error, c);
     }),
@@ -182,5 +197,85 @@ export const storeRoutes = new Hono<StoreContext>()
       return c.json(HttpResponse.success("OK"));
     }
   )
+  .get(
+    "/:storeId/ai/suggestions/generate",
+    storeCheckMiddleware,
+    describeRoute({
+      tags: ["Store"],
+      description: "Generate AI suggestions for a store",
+      parameters: [AuthHeaderParameter, StoreIdParameter],
+      responses: {
+        200: {
+          description: "Suggestions generated",
+          content: {
+            "application/json": {
+              schema: resolver(
+                z.object({
+                  data: Ai.AiGeneratedDataSchema,
+                })
+              ),
+            },
+          },
+        },
+        500: ErrorResponses[500],
+      },
+    }),
+    async (c) => {
+      const store = c.get("store");
+
+      let analytics = await Sales.generateAnalyticsReport(store.id);
+      try {
+        let aiResponse = await AiClient.generateStoreSuggestions(
+          store,
+          analytics
+        );
+        await Ai.saveAiSuggestions(store.id, aiResponse);
+        return c.json(
+          HttpResponse.success<Ai.AiGeneratedData>({
+            response: aiResponse,
+            isFromDb: false,
+            createdAt: new Date(),
+            label: "suggestions",
+          })
+        );
+      } catch (e) {
+        c.status(500);
+        return c.json(HttpResponse.error(`${e}`));
+      }
+    }
+  )
+  .get(
+    "/:storeId/ai/suggestions/get",
+    storeCheckMiddleware,
+    describeRoute({
+      tags: ["Store"],
+      description: "Get a previously generated AI suggestion for a store",
+      parameters: [AuthHeaderParameter, StoreIdParameter],
+      responses: {
+        200: {
+          description: "Previous AI suggestions response found",
+          content: {
+            "application/json": {
+              schema: resolver(
+                z.object({
+                  data: Ai.AiGeneratedDataSchema,
+                })
+              ),
+            },
+          },
+        },
+        404: ErrorResponses[404],
+      },
+    }),
+    async (c) => {
+      const store = c.get("store");
+      let data = await Ai.fetchLastSuggestions(store.id);
+      if (!data) {
+        c.status(404);
+        return c.json(HttpResponse.notFound());
+      }
+      return c.json(HttpResponse.success<Ai.AiGeneratedData>(data));
+    }
+  )
   .route("/:storeId/products", productRoutes)
-  .route("/:storeId/sales", salesRoutes)
+  .route("/:storeId/sales", salesRoutes);

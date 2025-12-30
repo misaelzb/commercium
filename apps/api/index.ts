@@ -4,4 +4,5 @@ export type ApiType = typeof app;
 export default {
   port: 3001,
   fetch: app.fetch,
+  idleTimeout: 60
 }

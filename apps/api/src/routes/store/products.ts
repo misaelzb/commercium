@@ -7,6 +7,7 @@ import z from "zod";
 import { HttpResponse, HttpStatus, Products } from "@commercium/core";
 import { zValidator } from "@hono/zod-validator";
 import type { StatusCode } from "hono/utils/http-status";
+import { RequestBodyExample } from "../../util/commonData";
 
 
 export const productRoutes = new Hono<StoreContext>()
@@ -97,6 +98,15 @@ export const productRoutes = new Hono<StoreContext>()
         },
         400: ErrorResponses[400],
       },
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: RequestBodyExample.ProductData,
+            },
+          },
+        },
+      }
     }),
     zValidator("json", Products.ProductCreateSchema, (result, c) => {
       if (!result.success) return handleInvalidBody(result.error, c);
@@ -136,6 +146,15 @@ export const productRoutes = new Hono<StoreContext>()
         },
         400: ErrorResponses[400],
       },
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: RequestBodyExample.ProductData,
+            },
+          },
+        },
+      }
     }),
     zValidator("json", Products.ProductUpdateSchema, (result, c) => {
       if (!result.success) return handleInvalidBody(result.error, c);

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { describeRoute, resolver } from "hono-openapi";
 import { authMiddleware, type AuthContext } from "../middlewares";
 import { HttpResponse, User } from "@commercium/core";
-import { AuthHeaderParameter } from "../util";
+import { AuthHeaderParameter, ErrorResponses } from "../util";
 import z from "zod";
 
 export const userRoutes = new Hono<AuthContext>().get(
@@ -23,6 +23,7 @@ export const userRoutes = new Hono<AuthContext>().get(
           },
         },
       },
+      401: ErrorResponses[401]
     },
   }),
   authMiddleware,

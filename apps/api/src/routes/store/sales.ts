@@ -11,7 +11,7 @@ import {
   StoreIdParameter,
 } from "../../util";
 import z from "zod";
-import { SaleIdParameter } from "../../util/commonData";
+import { RequestBodyExample, SaleIdParameter } from "../../util/commonData";
 
 export const salesRoutes = new Hono<StoreContext>()
   .use("*", storeCheckMiddleware)
@@ -46,18 +46,8 @@ export const salesRoutes = new Hono<StoreContext>()
         content: {
           "application/json": {
             schema: {
-              example: {
-                storeId: 1,
-                label: "My Sale",
-                details: [
-                  {
-                    productId: 1,
-                    quantity: 1,
-                    unitPrice: 10.0,
-                  },
-                ],
-              },
-            },
+              example: RequestBodyExample.SaleData,
+            }
           },
         },
       },

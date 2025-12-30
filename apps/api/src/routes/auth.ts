@@ -32,6 +32,20 @@ export const authRoutes = new Hono()
         },
         [400]: ErrorResponses[400],
       },
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: {
+                firstName: "John",
+                lastName: "Doe",
+                username: "johndoe",
+                password: "password123",
+              },
+            },
+          },
+        },
+      }
     }),
     zValidator("json", User.CreateSchema, (result, c) => {
       if (!result.success) return handleInvalidBody(result.error, c);
@@ -64,6 +78,18 @@ export const authRoutes = new Hono()
               ),
               example: {
                 data: "0471ab.....dfba53",
+              },
+            },
+          },
+        },
+      },
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              example: {
+                username: "johndoe",
+                password: "password123",
               },
             },
           },

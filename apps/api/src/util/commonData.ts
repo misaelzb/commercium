@@ -16,6 +16,18 @@ export const ErrorResponses = {
       },
     },
   },
+  401: {
+    description: "Unauthorized",
+    content: {
+      "application/json": {
+        schema: resolver(
+          z.object({
+            data: z.string(),
+          })
+        ),
+      },
+    },
+  },
   404: {
     description: "Not found",
     content: {
@@ -30,6 +42,47 @@ export const ErrorResponses = {
         },
       },
     },
+  },
+  500: {
+    description: "Internal server error",
+    content: {
+      "application/json": {
+        schema: resolver(
+          z.object({
+            error: z.string(),
+          })
+        ),
+        example: {
+          error: "Internal server error",
+        },
+      },
+    },
+  },
+};
+
+export const RequestBodyExample = {
+  StoreData: {
+    name: "My store",
+    description: "My store description",
+  },
+  ProductData: {
+    description: "My product description",
+    sku: "MY-PROD-9991234",
+    costPrice: 10.0,
+    salePrice: 15.0,
+    stock: 10,
+  },
+
+  SaleData: {
+    storeId: 1,
+    label: "My Sale",
+    details: [
+      {
+        productId: 1,
+        quantity: 1,
+        unitPrice: 10.0,
+      },
+    ],
   },
 };
 
