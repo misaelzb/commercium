@@ -9,4 +9,6 @@ export { Products } from "./src/db/store/products";
 export { Store } from "./src/db/store"
 export { Sales } from "./src/db/sales"
 export type { ApiResponse } from "./src/http/response"
+export { AiClient } from "./src/shared/ai"
+export { Ai } from "./src/db/ai"
 export * from "./src/http"

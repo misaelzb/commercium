@@ -98,7 +98,7 @@ export namespace Sales {
   export const SaleInfoSchema = z.object({
     id: z.number(),
     storeId: z.number(),
-    label: z.string().nullable(),
+    label: z.string().max(100).nullable(),
     total: z.number(),
     createdAt: dateValue(),
     details: z.array(
@@ -166,6 +166,10 @@ export namespace Sales {
     return finalSales;
   };
 
+  const BriefProductStat = z.object({
+    info: Products.ProductSchema,
+    quantity: z.number(),
+  });
   export const AnalyticsReportSchema = z.object({
     period: z.string(),
     totalSales: z.number(),
@@ -173,12 +177,9 @@ export namespace Sales {
     revenue: z.number(),
     profit: z.number(),
     averageOrderValue: z.number(),
-    topProducts: z.array(
-      z.object({
-        info: Products.ProductSchema,
-        quantity: z.number(),
-      })
-    ),
+    avgDailyCustomers: z.number(),
+    lowProducts: z.array(BriefProductStat),
+    topProducts: z.array(BriefProductStat),
   });
 
   export type AnalyticsReport = z.infer<typeof AnalyticsReportSchema>;
@@ -204,6 +205,12 @@ export namespace Sales {
     let totalItems = 0;
     let totalSales = monthSales.length;
 
+    const uniqueDays = new Set(
+      monthSales.map((s) => s.createdAt.toISOString().slice(0, 10))
+    ).size;
+
+    const avgDailyCustomers = uniqueDays > 0 ? totalSales / uniqueDays : 0;
+
     for (const sale of monthSales) {
       for (const detail of sale.details) {
         const saleAmount = detail.quantity * Number(detail.unitPrice);
@@ -215,7 +222,7 @@ export namespace Sales {
       }
     }
 
-    const topProducts = Object.values(
+    const productStats = Object.values(
       allSales.reduce(
         (acc, s) => (
           s.details.forEach((d) => {
@@ -226,14 +233,22 @@ export namespace Sales {
         ),
         {} as Record<number, { info: Products.ProductType; quantity: number }>
       )
-    )
+    );
+
+    const topProducts = productStats
       .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 3);
+
+    const lowProducts = productStats
+      .sort((a, b) => a.quantity - b.quantity)
       .slice(0, 3);
 
     return {
       period: `${currentYear}-${currentMonth + 1}`,
       totalSales,
       totalItems,
+      avgDailyCustomers,
+      lowProducts,
       revenue,
       profit,
       averageOrderValue: totalSales ? revenue / totalSales : 0,
@@ -290,7 +305,7 @@ export namespace Sales {
       .where(and(eq(salesTable.id, id), eq(salesTable.storeId, storeId)))
       .then((r) => ({ success: true }))
       .catch((e) => ({ success: false, errorDetail: e.message }));
-      
+
     return result;
   };
 }

@@ -22,6 +22,27 @@
       "when": 1766893339178,
       "tag": "0002_clumsy_star_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1767016413659,
+      "tag": "0003_stormy_absorbing_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1767041554800,
+      "tag": "0004_colorful_cobalt_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1767056360711,
+      "tag": "0005_fast_thanos",
+      "breakpoints": true
     }
   ]
 }

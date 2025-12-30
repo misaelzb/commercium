@@ -9,7 +9,7 @@ export const salesTable = mysqlTable("sales", {
     .notNull()
     .references(() => storeTable.id, { onDelete: "cascade" }),
 
-  label: varchar("label", { length: 255 }),
+  label: varchar("label", { length: 100 }),
   total: decimal("total", { precision: 15, scale: 2 }).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),

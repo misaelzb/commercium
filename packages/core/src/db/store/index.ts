@@ -3,15 +3,13 @@ import { Drizzle } from "../../shared/drizzle";
 import { storeTable } from "./store.sql";
 import { eq } from "drizzle-orm";
 import type { DBQueryResponse } from "..";
-import { productsTable } from "./products/products.sql";
 import { dateValue } from "../../util/specialTypes";
-import { saleDetailsTable, salesTable } from "../sales/sales.sql";
 
 export namespace Store {
   export const StoreSchema = z.object({
     id: z.number(),
     name: z.string().min(3).max(35),
-    description: z.string().min(3).max(50).optional().nullable().default(null),
+    description: z.string().min(3).max(100).optional().nullable().default(null),
     ownerId: z.number(),
     createdAt: dateValue(),
   });
@@ -79,7 +77,6 @@ export namespace Store {
     data: StoreCreateType
   ): Promise<DBQueryResponse<string>> => {
     await Drizzle.db.update(storeTable).set(data).where(eq(storeTable.id, id));
-
     return { success: true, data: "OK" };
-  }
+  };
 }

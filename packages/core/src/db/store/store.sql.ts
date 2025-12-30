@@ -4,7 +4,7 @@ import { userTable } from "../users/users.sql";
 export const storeTable = mysqlTable("stores", {
   id: int("id").primaryKey().autoincrement(),
   name: varchar("name", { length: 35 }).notNull(),
-  description: varchar("description", { length: 50 }),
+  description: varchar("description", { length: 100 }),
 
   ownerId: int("owner_id")
     .notNull()

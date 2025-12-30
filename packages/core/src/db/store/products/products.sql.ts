@@ -11,7 +11,7 @@ import { storeTable } from "../store.sql";
 export const productsTable = mysqlTable("products", {
   id: int("id").primaryKey().autoincrement(),
   sku: varchar("sku", { length: 255 }).unique().notNull(), // Bar code
-  description: varchar("description", { length: 255 }).notNull(),
+  description: varchar("description", { length: 120 }).notNull(),
 
   costPrice: decimal("cost_price", { precision: 15, scale: 2 }).notNull(),
   salePrice: decimal("sale_price", { precision: 15, scale: 2 }).notNull(),

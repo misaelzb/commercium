@@ -7,7 +7,7 @@ import { dateValue } from "../../../util/specialTypes";
 
 export namespace Products {
   const generateSKU = () => {
-    return `SKU-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+    return `P-${Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join('')}`;
   };
   export const ProductSchema = z.object({
     id: z.number(),
@@ -21,7 +21,7 @@ export namespace Products {
         .optional()
         .default(() => generateSKU())
     ),
-    description: z.string().min(3).max(255),
+    description: z.string().min(3).max(120),
     costPrice: z.number().min(0),
     salePrice: z.number().min(0),
     storeId: z.number(),
