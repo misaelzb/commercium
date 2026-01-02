@@ -176,6 +176,8 @@ export namespace Sales {
     totalItems: z.number(),
     revenue: z.number(),
     profit: z.number(),
+    allTimeRevenue: z.number(),
+    allTimeProfit: z.number(),
     averageOrderValue: z.number(),
     avgDailyCustomers: z.number(),
     lowProducts: z.array(BriefProductStat),
@@ -195,6 +197,16 @@ export namespace Sales {
 
     let revenue = 0;
     let profit = 0;
+
+    let allTimeRevenue = allSales.reduce((acc, info) => acc + Number(info.total), 0)
+    let allTimeProfit = allSales.reduce((acc, info) => {
+      const saleAmount = info.details.reduce((acc, detail) => {
+        const salePrice = detail.quantity * Number(detail.unitPrice);
+        const costPrice = detail.product.costPrice * detail.quantity;
+        return acc + salePrice - costPrice;
+      }, 0);
+      return acc + saleAmount;
+    }, 0);
 
     const monthSales = allSales.filter(
       (sale) =>
@@ -248,6 +260,8 @@ export namespace Sales {
       totalSales,
       totalItems,
       avgDailyCustomers,
+      allTimeRevenue,
+      allTimeProfit,
       lowProducts,
       revenue,
       profit,

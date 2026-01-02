@@ -31,10 +31,18 @@ STORE CONTEXT:
 - Name: ${store.name}
 - Description: ${store.description}
 
-METRICS:
+METRICS FOR THIS MONTH:
+- Total Sales: ${analytics.totalSales}
+- Total Items: ${analytics.totalItems}
+- Revenue: ${analytics.revenue} USD
+- Profit: ${analytics.profit} USD
 - Avg Daily Customers: ${analytics.avgDailyCustomers}
 - Avg Order Value: ${analytics.averageOrderValue} USD
 - Monthly Revenue: ${analytics.revenue} USD
+
+ALL TIME PERFORMANCE:
+- All Time Revenue: ${analytics.allTimeRevenue} USD
+- All Time Profit: ${analytics.allTimeProfit} USD
 
 PRODUCT PERFORMANCE:
 - Top Selling: ${analytics.topProducts.map(p => `${p.info.description} (Cost: ${p.info.costPrice}, Sale: ${p.info.salePrice})`).join(" || ")}
@@ -61,7 +69,7 @@ OUTPUT STRUCTURE:
 }`
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
