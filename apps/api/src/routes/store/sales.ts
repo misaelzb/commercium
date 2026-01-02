@@ -127,7 +127,6 @@ export const salesRoutes = new Hono<StoreContext>()
     async (c) => {
       let store = c.get("store");
       let report = await Sales.generateAnalyticsReport(store.id);
-
       return c.json(HttpResponse.success(report));
     }
   )

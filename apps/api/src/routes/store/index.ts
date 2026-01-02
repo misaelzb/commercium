@@ -238,9 +238,9 @@ export const storeRoutes = new Hono<StoreContext>()
             label: "suggestions",
           })
         );
-      } catch (e) {
+      } catch (e: any) {
         c.status(500);
-        return c.json(HttpResponse.error(`${e}`));
+        return c.json(HttpResponse.error(`${e?.message || e?.error?.message || e || "Unknown error"}`));
       }
     }
   )
