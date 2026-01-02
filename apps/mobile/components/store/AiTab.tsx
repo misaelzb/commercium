@@ -53,7 +53,7 @@ export default function AiTab({
   };
 
   useEffect(() => {
-    handleAIRequest("get", false);
+    if (!aiData) handleAIRequest("get", false);
   }, []);
 
   const capitalize = (t: string) =>
