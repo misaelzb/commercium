@@ -265,10 +265,11 @@ export const useStoreActions = (storeId: string) => {
       const res = await client.api.stores[":storeId"].ai.suggestions[type].$get({
         param: { storeId },
       });
+      const json = await res.json();
       if (res.ok) {
-        const json = await res.json();
         if (json.data) return json.data;
       }
+      else throw json.error;
     } catch (err) {
       console.error(err);
       throw err;
