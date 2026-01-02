@@ -10,7 +10,8 @@ import Toast from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CoModal } from "../CoModal";
 import { getLayoutInfo } from "@/util";
-const { isWide } = getLayoutInfo()
+import { CoSeparator } from "../CoSeparator";
+const { isWide } = getLayoutInfo();
 
 export default function SalesTab({
   sales,
@@ -34,10 +35,24 @@ export default function SalesTab({
 
     setSelectedSale(null);
   };
-
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   return (
     <>
       <View style={styles.mainContainer}>
+        <CoText asTitle>{months[new Date().getMonth()]}'s Analytics</CoText>
         <View style={{ gap: 10 }}>
           <View style={styles.row}>
             <CoCard style={{ flex: 1, marginRight: 10 }}>
@@ -51,11 +66,26 @@ export default function SalesTab({
           </View>
 
           <View style={styles.row}>
-            <CoCard style={{ flex: 1, marginRight: 10 }}>
-              <CoText asLabel>Total Stock Sold</CoText>
-              <CoText style={styles.smallCardValue}>
-                {analytics.totalItems}
+            <CoCard
+              style={{
+                flex: 1,
+                marginRight: 10,
+                gap: 0,
+                borderColor: Palette.backgroundHighlight,
+                borderWidth: 2,
+              }}
+            >
+              <CoText asLabel style={{ marginBottom: 8 }}>
+                All Time Statistics
               </CoText>
+              <View style={[styles.row, { marginBottom: 0 }]}>
+                <CoText style={{ fontWeight: "600" }}>Revenue: </CoText>
+                <CoText>${analytics.allTimeRevenue.toFixed(2)}</CoText>
+              </View>
+              <View style={styles.row}>
+                <CoText style={{ fontWeight: "600" }}>Profit: </CoText>
+                <CoText>${analytics.allTimeProfit.toFixed(2)}</CoText>
+              </View>
             </CoCard>
             <CoCard style={{ flex: 1 }}>
               <CoText asLabel>Average Order Value</CoText>
@@ -241,6 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
     width: isWide ? "50%" : "100%",
     alignSelf: "center",
+    gap: 10,
   },
   cardValue: { fontSize: 32, fontWeight: "bold", color: "#212529" },
   badge: {
@@ -277,7 +308,11 @@ const styles = StyleSheet.create({
     textAlign: "right",
     alignItems: "flex-end",
   },
-  smallCardValue: { fontSize: 18, fontWeight: "bold", marginTop: 5 },
+  smallCardValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 5,
+  },
   historyHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
