@@ -1,4 +1,4 @@
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import CoButton from "../CoButton";
 import { Products } from "@commercium/core";
 import { ProductCard } from "../products/ProductCard";
