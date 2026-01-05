@@ -38,6 +38,7 @@ export default function CoInput({
             Platform.OS === "web" ? { outlineStyle: "none" } : undefined,
             style,
           ]}
+          keyboardType={keyboardType}
           onChangeText={(text) => {
             if (!onChangeText) return;
             if (keyboardType === "numeric") {
