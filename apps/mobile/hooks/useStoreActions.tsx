@@ -268,10 +268,8 @@ export const useStoreActions = (storeId: string) => {
       const json = await res.json();
       if (res.ok) {
         if (json.data) return json.data;
-      }
-      else throw json.error;
+      } else throw json.error;
     } catch (err) {
-      console.error(err);
       throw err;
     } finally {
       setActionLoading(false);

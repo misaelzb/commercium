@@ -4,7 +4,6 @@ import { CoText } from "../CoText";
 import { CoCard } from "../CoCard";
 import CoButton from "../CoButton";
 import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions } from "react-native";
 import { useStoreActions } from "@/hooks/useStoreActions";
 import { useLocalSearchParams } from "expo-router";
 import { Palette } from "@/styles/pallete";
@@ -12,14 +11,14 @@ import Toast from "react-native-toast-message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect } from "react";
 import { getLayoutInfo } from "@/util";
-const { isWide } = getLayoutInfo()
+const { isWide } = getLayoutInfo();
 
 export default function AiTab({
   aiData,
   afterRequest,
   onTabLockToggle,
 }: {
-  aiData: Ai.AiGeneratedData | null;
+  aiData: Ai.AiGeneratedData | null | undefined;
   afterRequest: (data: Ai.AiGeneratedData | null) => void;
   onTabLockToggle: (locked: boolean) => void;
 }) {
@@ -44,16 +43,18 @@ export default function AiTab({
         } else afterRequest(data);
       }
     } catch (error) {
-      Toast.show({
-        text1: "Failed to fetch AI suggestions",
-        text2: `${error}`,
-        type: "error",
-      });
+      if (showToast)
+        Toast.show({
+          text1: "Failed to fetch AI suggestions",
+          text2: `${error}`,
+          type: "error",
+        });
+      afterRequest(null);
     }
   };
 
   useEffect(() => {
-    if (!aiData) handleAIRequest("get", false);
+    if (aiData === undefined) handleAIRequest("get", false).catch(() => {}); // initial load
   }, []);
 
   const capitalize = (t: string) =>
@@ -115,7 +116,9 @@ export default function AiTab({
             <CoText>{aiData.response.summary}</CoText>
           </CoCard>
           <View style={{ marginTop: 20, gap: 10 }}>
-            <CoText asTitle style={styles.carrouselTitle}>Revenue Growth Actions</CoText>
+            <CoText asTitle style={styles.carrouselTitle}>
+              Revenue Growth Actions
+            </CoText>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -126,10 +129,10 @@ export default function AiTab({
                   style={[styles.carrouselCard, styles[action.priority]]}
                   key={"RgR" + index}
                 >
-                  <CoText style={styles.mediumTitle}>
-                    {action.title}
+                  <CoText style={styles.mediumTitle}>{action.title}</CoText>
+                  <CoText style={styles.actionText}>
+                    {action.description}
                   </CoText>
-                  <CoText style={styles.actionText}>{action.description}</CoText>
                   <View style={styles.carrouselCardFooter}>
                     <View
                       style={[
@@ -156,7 +159,9 @@ export default function AiTab({
             </ScrollView>
           </View>
           <View style={{ gap: 10 }}>
-            <CoText asTitle style={styles.carrouselTitle}>Product Optimization Actions</CoText>
+            <CoText asTitle style={styles.carrouselTitle}>
+              Product Optimization Actions
+            </CoText>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -168,10 +173,10 @@ export default function AiTab({
                     style={[styles.carrouselCard, styles[action.priority]]}
                     key={"PrO" + index}
                   >
-                    <CoText style={styles.mediumTitle}>
-                      {action.title}
+                    <CoText style={styles.mediumTitle}>{action.title}</CoText>
+                    <CoText style={styles.actionText}>
+                      {action.description}
                     </CoText>
-                    <CoText style={styles.actionText}>{action.description}</CoText>
                     <View style={styles.carrouselCardFooter}>
                       <View
                         style={[
@@ -202,7 +207,9 @@ export default function AiTab({
               )}
             </ScrollView>
           </View>
-          <CoText asTitle style={styles.carrouselTitle}>Quick Wins</CoText>
+          <CoText asTitle style={styles.carrouselTitle}>
+            Quick Wins
+          </CoText>
           {aiData.response.quickWins.map((item, index) => (
             <CoCard key={"Qui" + index} style={styles.quickWinsCard}>
               <Ionicons
@@ -239,7 +246,6 @@ const styles = StyleSheet.create({
   },
   carrouselCard: {
     width: 280,
-    height: 220,
     borderRadius: 25,
   },
   mediumTitle: {
@@ -247,7 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   actionText: {
-    fontSize: 14
+    fontSize: 14,
   },
   badge: {
     paddingHorizontal: 4,

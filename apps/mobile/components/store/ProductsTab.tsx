@@ -1,7 +1,7 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import CoButton from "../CoButton";
 import { Products } from "@commercium/core";
-import { CoProductCard } from "../products/CoProductCard";
+import { ProductCard } from "../products/ProductCard";
 import { FlatList, View } from "react-native";
 import { CoCard } from "../CoCard";
 import { CoText } from "../CoText";
@@ -45,7 +45,7 @@ export const ProductsTab = ({
       numColumns={isWide ? 2 : 1}
       renderItem={({ item }) => {
         return (
-          <CoProductCard
+          <ProductCard
             key={item.id}
             data={item}
             selectedProductState={selectedProductState}
