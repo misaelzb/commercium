@@ -48,7 +48,7 @@ export default function StoreHome() {
     deleteSale,
   } = useStoreActions(storeId);
   
-  const [aiData, setAiData] = useState<Ai.AiGeneratedData | null>(null);
+  const [aiData, setAiData] = useState<Ai.AiGeneratedData | null>();
   const [tabLocked, setTabLocked] = useState(false);
 
   const Tabs = { ANALYTICS: 0, AI: 1, PRODUCTS: 2, CONFIG: 3 }; // to make code easier to understand.

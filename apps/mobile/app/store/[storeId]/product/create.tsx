@@ -1,4 +1,4 @@
-import { CoProductForm, CoSafeContainer } from "@/components";
+import { ProductForm, CoSafeContainer } from "@/components";
 import { Stack } from "expo-router";
 
 
@@ -12,6 +12,6 @@ export default function CreateProduct() {
 				title: "Create a product"
 			}}
 		/>
-		<CoProductForm type="create"/>
+		<ProductForm type="create"/>
 	</CoSafeContainer>
 }

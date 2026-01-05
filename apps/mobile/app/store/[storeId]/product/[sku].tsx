@@ -1,4 +1,4 @@
-import { CoLoadingContainer, CoProductForm, CoSafeContainer } from "@/components";
+import { CoLoadingContainer, ProductForm, CoSafeContainer } from "@/components";
 import { useStoreActions } from "@/hooks/useStoreActions";
 import { Palette } from "@/styles/pallete";
 import { productDataAsForm, ProductInputData } from "@/util";
@@ -33,7 +33,7 @@ export default function EditProduct() {
 					headerTintColor: 'white',
 				}}
 			/>
-			<CoProductForm type="edit" initialProduct={product} afterEdit={(data) => setProduct(data)}/>
+			<ProductForm type="edit" initialProduct={product} afterEdit={(data) => setProduct(data)}/>
 		</> : <>
 			<Stack.Screen
 				options={{
