@@ -7,7 +7,6 @@ import { CoCard } from "../CoCard";
 import { CoText } from "../CoText";
 import CoInput from "../CoInput";
 import { useEffect, useState } from "react";
-import { Dimensions } from "react-native";
 import { getLayoutInfo } from "@/util";
 const { isWide } = getLayoutInfo()
 
