@@ -18,7 +18,7 @@ import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useStoreActions } from "@/hooks/useStoreActions";
 
-interface CoProductFormProps {
+interface ProductFormProps {
   type: "create" | "edit";
   initialProduct?: ProductInputData;
   afterEdit?: (data: ProductInputData) => void;
@@ -26,11 +26,11 @@ interface CoProductFormProps {
 
 const { isWide } = getLayoutInfo();
 
-export const CoProductForm = ({
+export const ProductForm = ({
   type,
   initialProduct,
   afterEdit,
-}: CoProductFormProps) => {
+}: ProductFormProps) => {
   const params = useLocalSearchParams();
   const { editProduct } = useStoreActions(params.storeId.toString());
   const [data, setData] = useState<ProductInputData>(
@@ -179,6 +179,7 @@ export const CoProductForm = ({
             onChangeText={(value) => updateInput("salePrice", value)}
             value={data.salePrice}
             error={errors.salePrice}
+            style={{ flex: 1 }}
           />
         </View>
       </View>

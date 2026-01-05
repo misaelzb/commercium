@@ -9,7 +9,7 @@ import { getLayoutInfo } from "@/util";
 
 const { isWide } = getLayoutInfo();
 
-type CoProductCardProps = {
+type ProductCardProps = {
   data: Products.ProductType;
   selectedProductState: [
     Products.ProductType | null,
@@ -17,10 +17,10 @@ type CoProductCardProps = {
   ]; // null = not selected / not showing modal
 };
 
-export function CoProductCard({
+export function ProductCard({
   data: product,
   selectedProductState,
-}: CoProductCardProps) {
+}: ProductCardProps) {
   const [selectedProduct, setSelectedProduct] = selectedProductState;
   return (
     <>
