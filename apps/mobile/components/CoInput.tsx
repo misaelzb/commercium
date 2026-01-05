@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   TextInputProps,
+  Platform,
 } from "react-native";
 
 interface CoInputProps extends TextInputProps {
@@ -19,15 +20,34 @@ export default function CoInput({
   style,
   label,
   prefix,
+  onChangeText,
+  keyboardType,
   ...props
 }: CoInputProps) {
+
   return (
     <View style={styles.container}>
       {label && <Text style={styles.inputLabel}>{label}</Text>}
 
       <View style={[styles.inputWrapper]}>
         {prefix && <Text style={styles.prefix}>{prefix}</Text>}
-        <TextInput style={[styles.input, style]} {...props} placeholderTextColor={"#8a8a8aff"}/>
+        <TextInput
+          style={[
+            styles.input,
+            //@ts-ignore
+            Platform.OS === "web" ? { outlineStyle: "none" } : undefined,
+            style,
+          ]}
+          onChangeText={(text) => {
+            if (!onChangeText) return;
+            if (keyboardType === "numeric") {
+              if (isNaN(Number(text))) return;
+              onChangeText(text);
+            } else onChangeText(text);
+          }}
+          {...props}
+          placeholderTextColor={"#8a8a8aff"}
+        />
       </View>
       {error && <Text style={styles.error}>{error}</Text>}
     </View>
@@ -61,6 +81,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    width: "100%",
   },
   error: {
     color: Palette.danger,
