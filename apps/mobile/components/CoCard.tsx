@@ -43,7 +43,7 @@ export const CoCard = function ({ children, ...props }: CoCardProps) {
       </TouchableOpacity>
     );
   }
-  return <View style={[styles.card, props.style]}>{children}</View>;
+  return <View style={[styles.card, props.style]}>{children}</View>
 };
 
 export const CoCardTitle = function ({ children, ...props }: CoTextProps) {
