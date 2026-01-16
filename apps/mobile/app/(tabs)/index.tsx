@@ -179,7 +179,7 @@ export default function HomeTab() {
           />
         </CoHero>
         <View style={styles.container}>
-          <CoText asTitle style={{ width: "100%", paddingHorizontal: isWide ? "25%" : 0, }}>
+          <CoText asTitle style={{ width: "100%" }}>
             My Stores
           </CoText>
           <View style={styles.storesContainer}>
@@ -215,9 +215,12 @@ export default function HomeTab() {
             <CoCard
               touchable
               onPress={toggleShowModal}
-              style={[styles.storeCard, styles.addCard]}
+              style={[styles.storeCard, styles.addCard, localStores.length == 0 && { width: "100%" }]}
             >
               <Ionicons name="add" size={30} />
+              <CoText>
+                {localStores.length == 0 ? "Add your first store" : "Add Store"}
+              </CoText>
             </CoCard>
           </View>
         </View>
@@ -229,6 +232,7 @@ export default function HomeTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: isWide ? "25%" : 30,
     backgroundColor: Palette.almostWhite,
     top: -19,
     borderRadius: 20,
@@ -237,8 +241,6 @@ const styles = StyleSheet.create({
   },
 
   storesContainer: {
-    paddingHorizontal: isWide ? "25%" : 0,
-    alignSelf: "center",
     gap: 10,
     flexDirection: "row",
     flexWrap: "wrap",
@@ -262,8 +264,6 @@ const styles = StyleSheet.create({
   },
   storeCard: {
     backgroundColor: Palette.backgroundSecondary,
-    paddingVertical: 15,
-    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
