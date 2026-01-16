@@ -2,7 +2,7 @@
   "expo": {
     "name": "Commercium",
     "slug": "commercium",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "commercium",
@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#54965f",
         "foregroundImage": "./assets/images/adaptive-icon.png"
